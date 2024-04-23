@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+require("dotenv").config();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
