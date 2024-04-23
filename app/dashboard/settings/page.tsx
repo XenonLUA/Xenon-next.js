@@ -42,11 +42,6 @@ export default function SettingPage() {
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  useEffect(() => {
-    fetchCoinData();
-    fetchItems();
-  }, []);
-
   const fetchCoinData = async () => {
     try {
       setLoading(true);
@@ -59,7 +54,7 @@ export default function SettingPage() {
       setCoinData(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching coin data:");
+      console.error("Error fetching coin data:", error);
       setLoading(false);
     }
   };
@@ -73,10 +68,15 @@ export default function SettingPage() {
       setItems(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching items:");
+      console.error("Error fetching items:", error);
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCoinData();
+    fetchItems();
+  }, [fetchCoinData, fetchItems]);
 
   const updatePriceAndAmount = async () => {
     try {
@@ -88,11 +88,11 @@ export default function SettingPage() {
         .eq("id", 4);
       fetchCoinData();
       setSending(false);
-      console.log('Price and amount updated successfully');
+      console.log("Price and amount updated successfully");
     } catch (error) {
-      console.error("Error updating price and amount:");
+      console.error("Error updating price and amount:", error);
       setSending(false);
-      console.error('Failed to update price and amount');
+      console.error("Failed to update price and amount");
     }
   };
 
@@ -107,11 +107,11 @@ export default function SettingPage() {
         ]);
       fetchItems();
       setAdding(false);
-      console.log('Item added successfully');
+      console.log("Item added successfully");
     } catch (error) {
-      console.error("Error adding item to database:");
+      console.error("Error adding item to database:", error);
       setAdding(false);
-      console.error('Failed to add item');
+      console.error("Failed to add item");
     }
   };
 
@@ -122,11 +122,11 @@ export default function SettingPage() {
       await supabase.from("item").delete().eq("id", itemId);
       fetchItems();
       setLoading(false);
-      console.log('Item deleted successfully');
+      console.log("Item deleted successfully");
     } catch (error) {
-      console.error("Error deleting item from database:");
+      console.error("Error deleting item from database:", error);
       setLoading(false);
-      console.error('Failed to delete item');
+      console.error("Failed to delete item");
     }
   };
 

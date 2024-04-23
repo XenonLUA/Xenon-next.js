@@ -96,7 +96,9 @@ export default function DashboardPage() {
     fetchItems();
     fetchCoinData();
     fetchPaymentDetails();
-  }, []);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array
 
   const handleDeleteItem = async (itemId: number) => {
     try {
