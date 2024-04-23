@@ -14,13 +14,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 require("dotenv").config();
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Supabase URL or key is not defined");
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function SettingPage() {
   const formRef = useRef<HTMLFormElement>(null);
