@@ -14,18 +14,39 @@ import {
   TableFooter,
 } from "@/components/ui/table";
 
-export default function DashboardPage() {
-  const [items, setItems] = useState([]);
-  const [loadingItems, setLoadingItems] = useState(false);
-  const [coinData, setCoinData] = useState(null);
-  const [loadingCoin, setLoadingCoin] = useState(false);
-  const [paymentDetails, setPaymentDetails] = useState([]);
-  const [loadingDetails, setLoadingDetails] = useState(false);
+interface Item {
+  id: number;
+  name: string;
+  price: number;
+  photopath: string;
+}
 
-  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-  const supabaseKey = process.env.REACT_APP_SUPABASE_KEY;
-  
-  const supabase = createClient(supabaseUrl, supabaseKey);  
+interface CoinData {
+  harga: number;
+  koin_tersedia: number;
+}
+
+interface PaymentDetail {
+  zpt_id: number;
+  user_id: number;
+  username: string;
+  item: string;
+  terkirim: string;
+  timestamp: string;
+}
+
+export default function DashboardPage() {
+  const [items, setItems] = useState<Item[]>([]);
+  const [loadingItems, setLoadingItems] = useState<boolean>(false);
+  const [coinData, setCoinData] = useState<CoinData | null>(null);
+  const [loadingCoin, setLoadingCoin] = useState<boolean>(false);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
+  const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
+
+  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
+  const supabaseKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -35,7 +56,7 @@ export default function DashboardPage() {
         if (error) throw error;
         setItems(data);
       } catch (error) {
-        console.error("Error fetching items:", error.message);
+        console.error("Error fetching items:", error);
       } finally {
         setLoadingItems(false);
       }
@@ -51,7 +72,7 @@ export default function DashboardPage() {
         if (error) throw error;
         setCoinData(data);
       } catch (error) {
-        console.error("Error fetching coin data:", error.message);
+        console.error("Error fetching coin data:", error);
       } finally {
         setLoadingCoin(false);
       }
@@ -66,7 +87,7 @@ export default function DashboardPage() {
         if (error) throw error;
         setPaymentDetails(data);
       } catch (error) {
-        console.error("Error fetching payment details:", error.message);
+        console.error("Error fetching payment details:", error);
       } finally {
         setLoadingDetails(false);
       }
@@ -77,14 +98,14 @@ export default function DashboardPage() {
     fetchPaymentDetails();
   }, []);
 
-  const handleDeleteItem = async (itemId) => {
+  const handleDeleteItem = async (itemId: number) => {
     try {
       const { error } = await supabase.from("item").delete().eq("id", itemId);
       if (error) throw error;
       // Remove item from local state without fetching again
       setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
     } catch (error) {
-      console.error("Error deleting item:", error.message);
+      console.error("Error deleting item:", error);
     }
   };
 
