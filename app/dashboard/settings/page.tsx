@@ -1,17 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef, ChangeEvent, useCallback } from "react";
-import { createClient } from "@supabase/supabase-js";
-import { Progress } from "@/components/ui/progress";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +11,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { createClient } from "@supabase/supabase-js";
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function SettingPage() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -36,11 +36,6 @@ export default function SettingPage() {
   const [newCoinAmount, setNewCoinAmount] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [items, setItems] = useState<any[]>([]);
-
-  const supabaseUrl: string = "https://sqgifjezpzxplyvrrtev.supabase.co";
-  const supabaseKey: string =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
-  const supabase = createClient(supabaseUrl, supabaseKey);
 
   const fetchCoinData = useCallback(async () => {
     try {
@@ -88,11 +83,11 @@ export default function SettingPage() {
         .eq("id", 4);
       fetchCoinData();
       setSending(false);
-      console.log('Price and amount updated successfully');
+      console.log("Price and amount updated successfully");
     } catch (error) {
       console.error("Error updating price and amount:");
       setSending(false);
-      console.error('Failed to update price and amount');
+      console.error("Failed to update price and amount");
     }
   };
 
@@ -107,11 +102,11 @@ export default function SettingPage() {
         ]);
       fetchItems();
       setAdding(false);
-      console.log('Item added successfully');
+      console.log("Item added successfully");
     } catch (error) {
       console.error("Error adding item to database:");
       setAdding(false);
-      console.error('Failed to add item');
+      console.error("Failed to add item");
     }
   };
 
@@ -122,11 +117,11 @@ export default function SettingPage() {
       await supabase.from("item").delete().eq("id", itemId);
       fetchItems();
       setLoading(false);
-      console.log('Item deleted successfully');
+      console.log("Item deleted successfully");
     } catch (error) {
       console.error("Error deleting item from database:");
       setLoading(false);
-      console.error('Failed to delete item');
+      console.error("Failed to delete item");
     }
   };
 
@@ -174,8 +169,8 @@ export default function SettingPage() {
                     <DialogHeader>
                       <DialogTitle>Edit Coin</DialogTitle>
                       <DialogDescription>
-                        Make changes to your coin here. Click save when you&apos;re
-                        done.
+                        Make changes to your coin here. Click save when
+                        you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -239,8 +234,8 @@ export default function SettingPage() {
                     <DialogHeader>
                       <DialogTitle>Add Item List</DialogTitle>
                       <DialogDescription>
-                        Make changes to your item here. Click save when you&apos;re
-                        done.
+                        Make changes to your item here. Click save when
+                        you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -286,9 +281,7 @@ export default function SettingPage() {
                       {adding ? (
                         <Progress />
                       ) : (
-                        <Button onClick={addItemToDatabase}>
-                          Add Item
-                        </Button>
+                        <Button onClick={addItemToDatabase}>Add Item</Button>
                       )}
                     </DialogFooter>
                   </DialogContent>

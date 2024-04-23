@@ -1,18 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
-  TableCaption,
-  TableHeader,
-  TableRow,
-  TableHead,
   TableBody,
+  TableCaption,
   TableCell,
   TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
+import { createClient } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface Item {
   id: number;
@@ -43,10 +48,38 @@ export default function DashboardPage() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
   const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
 
-  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const getSession = async () => {
+    try {
+      const session = supabase.auth.getSession();
+      if (!session) throw new Error("Session not found");
+      return session;
+    } catch (error) {
+      console.error("Error getting session:", error);
+    }
+  };
+
+  const refreshSession = async () => {
+    try {
+      const { data: session, error } = await supabase.auth.refreshSession();
+      if (error) throw error;
+      return session;
+    } catch (error) {
+      console.error("Error refreshing session:", error);
+    }
+  };
+
+  const setSession = async (access_token: string, refresh_token: string) => {
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      });
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error setting session:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -93,6 +126,8 @@ export default function DashboardPage() {
       }
     };
 
+    refreshSession();
+    getSession();
     fetchItems();
     fetchCoinData();
     fetchPaymentDetails();
@@ -169,7 +204,9 @@ export default function DashboardPage() {
                         <TableCell>{item.price}</TableCell>
                         <TableCell>{item.photopath}</TableCell>
                         <TableCell>
-                          <button onClick={() => handleDeleteItem(item.id)}>Delete</button>{" "}
+                          <button onClick={() => handleDeleteItem(item.id)}>
+                            Delete
+                          </button>{" "}
                           {/* Add Delete button */}
                         </TableCell>
                       </TableRow>
@@ -199,23 +236,26 @@ export default function DashboardPage() {
               <TableRow>
                 <TableHead>User ID</TableHead>
                 <TableHead>Username</TableHead>
+                <TableHead>Zpt ID</TableHead>
                 <TableHead>Item</TableHead>
-                <TableHead>Delivered</TableHead> {/* Adjust column name */}
+                <TableHead>Delivered</TableHead>
                 <TableHead>Timestamp</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loadingDetails ? (
                 <TableRow>
-                  <TableCell colSpan={5}>Loading...</TableCell>
+                  <TableCell colSpan={6}>Loading...</TableCell>
+                  {/* Sesuaikan jumlah kolom */}
                 </TableRow>
               ) : (
                 paymentDetails.map((detail) => (
                   <TableRow key={detail.zpt_id}>
                     <TableCell>{detail.user_id}</TableCell>
                     <TableCell>{detail.username}</TableCell>
+                    <TableCell>{detail.zpt_id}</TableCell>
                     <TableCell>{detail.item}</TableCell>
-                    <TableCell>{detail.terkirim}</TableCell> {/* Adjust data field */}
+                    <TableCell>{detail.terkirim}</TableCell>
                     <TableCell>{detail.timestamp}</TableCell>
                   </TableRow>
                 ))
