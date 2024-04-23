@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -11,13 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { supabase } from "@/lib/supabase";
-import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
 require("dotenv").config();
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 interface Item {
   id: number;
@@ -40,7 +36,7 @@ interface PaymentDetail {
   timestamp: string;
 }
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [loadingItems, setLoadingItems] = useState<boolean>(false);
   const [coinData, setCoinData] = useState<CoinData | null>(null);
@@ -48,38 +44,14 @@ export default function DashboardPage() {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
   const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
 
-  const getSession = async () => {
-    try {
-      const session = supabase.auth.getSession();
-      if (!session) throw new Error("Session not found");
-      return session;
-    } catch (error) {
-      console.error("Error getting session:", error);
-    }
-  };
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  const refreshSession = async () => {
-    try {
-      const { data: session, error } = await supabase.auth.refreshSession();
-      if (error) throw error;
-      return session;
-    } catch (error) {
-      console.error("Error refreshing session:", error);
-    }
-  };
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase URL or key is not defined");
+  }
 
-  const setSession = async (access_token: string, refresh_token: string) => {
-    try {
-      const { data, error } = await supabase.auth.setSession({
-        access_token,
-        refresh_token,
-      });
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error("Error setting session:", error);
-    }
-  };
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -126,8 +98,6 @@ export default function DashboardPage() {
       }
     };
 
-    refreshSession();
-    getSession();
     fetchItems();
     fetchCoinData();
     fetchPaymentDetails();
@@ -266,4 +236,6 @@ export default function DashboardPage() {
       </Card>
     </div>
   );
-}
+};
+
+export default DashboardPage;
