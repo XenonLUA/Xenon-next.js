@@ -22,10 +22,10 @@ export default function DashboardPage() {
   const [paymentDetails, setPaymentDetails] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+  const supabaseKey = process.env.REACT_APP_SUPABASE_KEY;
+  
+  const supabase = createClient(supabaseUrl, supabaseKey);  
 
   useEffect(() => {
     const fetchItems = async () => {

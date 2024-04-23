@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -23,22 +23,22 @@ import {
 } from "@/components/ui/dialog";
 
 export default function SettingPage() {
-  const formRef = useRef();
-  const scrollRef = useRef();
-  const [newName, setNewName] = useState("");
-  const [newCoinPrice, setNewCoinPrice] = useState("");
-  const [newItemPrice, setNewItemPrice] = useState("");
-  const [newPhotoPath, setNewPhotoPath] = useState("");
-  const [updating, setUpdating] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [coinData, setCoinData] = useState(null);
-  const [newCoinAmount, setNewCoinAmount] = useState("");
-  const [sending, setSending] = useState(false);
-  const [items, setItems] = useState([]);
+  const formRef = useRef<HTMLFormElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [newName, setNewName] = useState<string>("");
+  const [newCoinPrice, setNewCoinPrice] = useState<string>("");
+  const [newItemPrice, setNewItemPrice] = useState<string>("");
+  const [newPhotoPath, setNewPhotoPath] = useState<string>("");
+  const [updating, setUpdating] = useState<boolean>(false);
+  const [adding, setAdding] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [coinData, setCoinData] = useState<any>(null);
+  const [newCoinAmount, setNewCoinAmount] = useState<string>("");
+  const [sending, setSending] = useState<boolean>(false);
+  const [items, setItems] = useState<any[]>([]);
 
-  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
-  const supabaseKey =
+  const supabaseUrl: string = "https://sqgifjezpzxplyvrrtev.supabase.co";
+  const supabaseKey: string =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -59,7 +59,7 @@ export default function SettingPage() {
       setCoinData(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching coin data:", error.message);
+      console.error("Error fetching coin data:");
       setLoading(false);
     }
   };
@@ -73,7 +73,7 @@ export default function SettingPage() {
       setItems(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching items:", error.message);
+      console.error("Error fetching items:");
       setLoading(false);
     }
   };
@@ -88,11 +88,11 @@ export default function SettingPage() {
         .eq("id", 4);
       fetchCoinData();
       setSending(false);
-      console.success('Price and amount updated successfully'); // Tambahkan console success
+      console.log('Price and amount updated successfully');
     } catch (error) {
-      console.error("Error updating price and amount:", error.message);
+      console.error("Error updating price and amount:");
       setSending(false);
-      console.error('Failed to update price and amount'); // Tambahkan console error
+      console.error('Failed to update price and amount');
     }
   };
 
@@ -107,46 +107,46 @@ export default function SettingPage() {
         ]);
       fetchItems();
       setAdding(false);
-      console.success('Item added successfully'); // Tambahkan console success
+      console.log('Item added successfully');
     } catch (error) {
-      console.error("Error adding item to database:", error.message);
+      console.error("Error adding item to database:");
       setAdding(false);
-      console.error('Failed to add item'); // Tambahkan console error
+      console.error('Failed to add item');
     }
   };
 
-  const deleteItemFromDatabase = async (itemId) => {
+  const deleteItemFromDatabase = async (itemId: number) => {
     try {
       setLoading(true);
       console.log("Deleting item from database...");
       await supabase.from("item").delete().eq("id", itemId);
       fetchItems();
       setLoading(false);
-      console.success('Item deleted successfully'); // Tambahkan console success
+      console.log('Item deleted successfully');
     } catch (error) {
-      console.error("Error deleting item from database:", error.message);
+      console.error("Error deleting item from database:");
       setLoading(false);
-      console.error('Failed to delete item'); // Tambahkan console error
+      console.error('Failed to delete item');
     }
   };
 
-  const handleNameChange = (e) => {
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewName(e.target.value);
   };
 
-  const handlePriceChange = (e) => {
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewCoinPrice(e.target.value);
   };
 
-  const handleItemPrice = (e) => {
+  const handleItemPrice = (e: ChangeEvent<HTMLInputElement>) => {
     setNewItemPrice(e.target.value);
   };
 
-  const handlePhotoPathChange = (e) => {
+  const handlePhotoPathChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewPhotoPath(e.target.value);
   };
 
-  const handleAmountChange = (e) => {
+  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewCoinAmount(e.target.value);
   };
 
@@ -233,7 +233,7 @@ export default function SettingPage() {
               <div className="space-y-1">
                 <Dialog>
                   <DialogTrigger asChild>
-                    <Button>Edit Item</Button>
+                    <Button>Add Item</Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
@@ -287,6 +287,7 @@ export default function SettingPage() {
                         <Progress />
                       ) : (
                         <Button onClick={addItemToDatabase}>
+                          Add Item
                         </Button>
                       )}
                     </DialogFooter>
