@@ -54,7 +54,7 @@ export default function SettingPage() {
       setCoinData(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching coin data:", error);
+      console.error("Error fetching coin data:");
       setLoading(false);
     }
   }, [supabase]);
@@ -68,7 +68,7 @@ export default function SettingPage() {
       setItems(data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching items:", error);
+      console.error("Error fetching items:");
       setLoading(false);
     }
   }, [supabase]);
@@ -88,11 +88,11 @@ export default function SettingPage() {
         .eq("id", 4);
       fetchCoinData();
       setSending(false);
-      console.log("Price and amount updated successfully");
+      console.log('Price and amount updated successfully');
     } catch (error) {
-      console.error("Error updating price and amount:", error);
+      console.error("Error updating price and amount:");
       setSending(false);
-      console.error("Failed to update price and amount");
+      console.error('Failed to update price and amount');
     }
   };
 
@@ -107,11 +107,11 @@ export default function SettingPage() {
         ]);
       fetchItems();
       setAdding(false);
-      console.log("Item added successfully");
+      console.log('Item added successfully');
     } catch (error) {
-      console.error("Error adding item to database:", error);
+      console.error("Error adding item to database:");
       setAdding(false);
-      console.error("Failed to add item");
+      console.error('Failed to add item');
     }
   };
 
@@ -122,11 +122,11 @@ export default function SettingPage() {
       await supabase.from("item").delete().eq("id", itemId);
       fetchItems();
       setLoading(false);
-      console.log("Item deleted successfully");
+      console.log('Item deleted successfully');
     } catch (error) {
-      console.error("Error deleting item from database:", error);
+      console.error("Error deleting item from database:");
       setLoading(false);
-      console.error("Failed to delete item");
+      console.error('Failed to delete item');
     }
   };
 
