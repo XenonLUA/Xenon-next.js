@@ -14,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 require("dotenv").config();
@@ -23,6 +22,7 @@ const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
 const supabaseKey =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
 
+const supabase = createClient(supabaseUrl, supabaseKey);
 export default function SettingPage() {
   const formRef = useRef<HTMLFormElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
