@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
+import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 require("dotenv").config();
