@@ -174,7 +174,7 @@ export default function SettingPage() {
                     <DialogHeader>
                       <DialogTitle>Edit Coin</DialogTitle>
                       <DialogDescription>
-                        Make changes to your coin here. Click save when you're
+                        Make changes to your coin here. Click save when you&apos;re
                         done.
                       </DialogDescription>
                     </DialogHeader>
@@ -239,7 +239,7 @@ export default function SettingPage() {
                     <DialogHeader>
                       <DialogTitle>Add Item List</DialogTitle>
                       <DialogDescription>
-                        Make changes to your item here. Click save when you're
+                        Make changes to your item here. Click save when you&apos;re
                         done.
                       </DialogDescription>
                     </DialogHeader>
