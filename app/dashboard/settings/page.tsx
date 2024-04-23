@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, ChangeEvent } from "react";
+import React, { useState, useEffect, useRef, ChangeEvent, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -42,7 +42,7 @@ export default function SettingPage() {
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  const fetchCoinData = async () => {
+  const fetchCoinData = useCallback(async () => {
     try {
       setLoading(true);
       console.log("Fetching coin data...");
@@ -57,9 +57,9 @@ export default function SettingPage() {
       console.error("Error fetching coin data:", error);
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
       console.log("Fetching items...");
@@ -71,7 +71,7 @@ export default function SettingPage() {
       console.error("Error fetching items:", error);
       setLoading(false);
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     fetchCoinData();
