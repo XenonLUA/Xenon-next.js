@@ -44,13 +44,9 @@ const DashboardPage = () => {
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
   const [loadingDetails, setLoadingDetails] = useState<boolean>(false);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Supabase URL or key is not defined");
-  }
-
+  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
+  const supabaseKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   useEffect(() => {
