@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/lib/supabase";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
