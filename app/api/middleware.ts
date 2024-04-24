@@ -17,3 +17,14 @@ export async function middleware(req: NextRequest) {
 
   return res;
 }
+
+export const config = {
+  async rewrites() {
+    return [
+      {
+        source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+        destination: "/app/api/middleware.ts",
+      },
+    ];
+  },
+};
