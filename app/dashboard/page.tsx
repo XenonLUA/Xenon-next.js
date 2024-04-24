@@ -13,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-require("dotenv").config();
 
 interface Item {
   id: number;
