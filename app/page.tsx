@@ -49,9 +49,9 @@ export default function Home() {
             </div>
             {progress === 100 && (
               <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Link href="/login">
+                <Link href="/dashboard">
                   <Button size="lg" className="w-full ">
-                    Login
+                    Dashboard
                   </Button>
                 </Link>
               </div>

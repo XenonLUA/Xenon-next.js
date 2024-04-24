@@ -25,7 +25,7 @@ export default function Login() {
       });
 
       if (userData) {
-        router.push("/dashboard"); // Arahkan ke halaman dashboard jika login berhasil
+        router.push("/"); // Arahkan ke halaman dashboard jika login berhasil
       } else if (error) {
         setError("Email atau password salah."); // Tetap di halaman login dan tampilkan pesan kesalahan jika login gagal
       }
