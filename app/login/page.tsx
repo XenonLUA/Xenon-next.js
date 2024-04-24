@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ReactTyped } from "react-typed";
 
 export default function Login() {
@@ -13,22 +13,24 @@ export default function Login() {
     password: "",
   });
 
-  const [error, setError] = useState(""); // Menambahkan state untuk pesan kesalahan
+  const [error, setError] = useState("");
 
   const router = useRouter();
 
   const login = async () => {
     try {
-      let { data: dataUser, error } = await supabase.auth.signInWithPassword({
+      const { data: userData, error } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
 
-      if (dataUser) {
-        router.push("/dashboard");
+      if (userData) {
+        router.push("/dashboard"); // Arahkan ke halaman dashboard jika login berhasil
+      } else if (error) {
+        setError("Email atau password salah."); // Tetap di halaman login dan tampilkan pesan kesalahan jika login gagal
       }
     } catch (error) {
-      setError("Email atau password salah."); // Menangani kesalahan dan menetapkan pesan kesalahan
+      console.error("Login error:");
     }
   };
 
@@ -39,23 +41,6 @@ export default function Login() {
       [name]: value,
     }));
   };
-
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress < 100) {
-          return prevProgress + 1;
-        } else {
-          clearInterval(interval);
-          return prevProgress;
-        }
-      });
-    }, 100);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
@@ -95,9 +80,7 @@ export default function Login() {
                   className="block w-full px-4 py-3 mt-4 text-base placeholder-gray-400 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
                 />
               </p>
-              {error && ( // Menampilkan pesan kesalahan jika ada
-                <p className="text-red-500">{error}</p>
-              )}
+              {error && <p className="text-red-500">{error}</p>}
             </div>
             <div>
               <div className="flex justify-center max-w-sm mx-auto mt-10">
