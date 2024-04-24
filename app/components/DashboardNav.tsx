@@ -5,7 +5,7 @@ import { Home, Settings, LogOut } from "lucide-react"; // Menambahkan LogOut ico
 import Link from "next/link"; // Import Link from Next.js untuk routing
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 export const navItems = [
   { name: "Home", href: "/dashboard", icon: Home },
@@ -14,11 +14,6 @@ export const navItems = [
 
 export async function DashboardNav() {
   const pathName = usePathname();
-
-  const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
-  const supabaseKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxZ2lmamV6cHp4cGx5dnJydGV2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTMzNDc2NzQsImV4cCI6MjAyODkyMzY3NH0.2yYEUffqta76luZ5mUF0pwgWNx3iEonvmxxr1KJge68";
-  const supabase = createClient(supabaseUrl, supabaseKey);
 
   const handleSignOut = async () => {
     // Menambahkan fungsi untuk sign out
