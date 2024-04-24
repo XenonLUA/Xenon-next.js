@@ -14,6 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+const cors = require("cors");
+
 interface Item {
   id: number;
   name: string;

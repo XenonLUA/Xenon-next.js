@@ -6,7 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { ReactTyped } from "react-typed";
-
+const cors = require("cors");
 export default function Login() {
   const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";
   const supabaseKey =

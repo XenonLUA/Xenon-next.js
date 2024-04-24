@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { createClient } from "@supabase/supabase-js";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+const cors = require("cors");
 
 export default function SettingPage() {
   const supabaseUrl = "https://sqgifjezpzxplyvrrtev.supabase.co";

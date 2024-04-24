@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import * as React from "react";
 import { ReactTyped } from "react-typed";
+const cors = require("cors");
 
 export default function Home() {
   const [progress, setProgress] = React.useState(13);
