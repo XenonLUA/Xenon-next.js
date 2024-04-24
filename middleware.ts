@@ -19,5 +19,12 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  async rewrites() {
+    return [
+      {
+        source: "/((?!api|_next/static|_next/image|favicon.ico).*)",
+        destination: "/api/middleware",
+      },
+    ];
+  },
 };
