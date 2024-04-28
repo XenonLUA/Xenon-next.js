@@ -12,7 +12,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/lib/supabase";
-import { createClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
 interface Item {
