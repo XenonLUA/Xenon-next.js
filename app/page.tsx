@@ -1,4 +1,3 @@
-// /app/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -50,6 +49,7 @@ export default function Home() {
     }, 100);
   };
 
+  // client-side code in page.tsx
   const generateKey = async () => {
     const newKey = generateRandomKey();
     const expiryDate = new Date();

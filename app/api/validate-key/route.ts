@@ -1,4 +1,4 @@
-// /pages/api/validate-key.ts
+// app/api/validate-key/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 
