@@ -10,16 +10,29 @@ export async function POST(req: NextRequest) {
 		}
 
 		const client = await clientPromise;
+
+		if (!client) {
+			throw new Error('Failed to connect to the database');
+		}
+
 		const db = client.db(process.env.MONGODB_DB);
+
+		if (!db) {
+			throw new Error('Database connection failed');
+		}
+
 		const collection = db.collection('validKeys');
 
 		const keyRecord = await collection.findOne({ key });
 
-		if (keyRecord && new Date(keyRecord.expiry) > new Date()) {
-			return NextResponse.json({ valid: true }, { status: 200 });
-		} else {
-			return NextResponse.json({ valid: false }, { status: 200 });
+		if (keyRecord) {
+			const expiryDate = new Date(keyRecord.expiry);
+			if (expiryDate > new Date()) {
+				return NextResponse.json({ valid: true }, { status: 200 });
+			}
 		}
+
+		return NextResponse.json({ valid: false }, { status: 200 });
 	} catch (error) {
 		console.error('Error validating key:', error);
 
