@@ -6,16 +6,11 @@ export async function POST(req: NextRequest) {
 	try {
 		const { key, expiry } = await req.json();
 
-		console.log("Received key:", key);
-		console.log("Received expiry:", expiry);
-
 		if (typeof key !== 'string' || typeof expiry !== 'string') {
-			console.error("Invalid key or expiry format");
 			return NextResponse.json({ message: 'Key and expiry must be strings' }, { status: 400 });
 		}
 
 		if (isNaN(Date.parse(expiry))) {
-			console.error("Invalid expiry date format");
 			return NextResponse.json({ message: 'Expiry must be a valid date' }, { status: 400 });
 		}
 
@@ -23,9 +18,8 @@ export async function POST(req: NextRequest) {
 		const db = client.db(process.env.MONGODB_DB);
 		const collection = db.collection('validKeys');
 
-		const result = await collection.insertOne({ key, expiry });
+		await collection.insertOne({ key, expiry });
 
-		console.log("Insert result:", result);
 		console.log("Saved key:", key, "Expiry:", expiry);
 		return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
 	} catch (error) {
