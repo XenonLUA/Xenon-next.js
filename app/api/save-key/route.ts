@@ -25,7 +25,6 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ message: 'Failed to save the key' }, { status: 500 });
 		}
 	} catch (error) {
-		console.error('Error saving key:', error);
 		return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 	}
 }

@@ -61,15 +61,19 @@ export default function Home() {
         body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
       });
 
-      console.log("Fetch response:", response);
-
       if (response.ok) {
         const responseData = await response.json();
         console.log("Response data:", responseData);
+
+        // Set the key and expiry state
         setKey(newKey);
         setExpiry(expiryDate.toLocaleString());
+
+        // Store the key and expiry in localStorage
         localStorage.setItem("key", newKey);
         localStorage.setItem("expiry", expiryDate.toISOString());
+
+        // Notify user of success
         toast.success("Key saved successfully.");
       } else {
         const errorData = await response.json();
