@@ -61,21 +61,27 @@ export default function Home() {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
 
-    // Save key to the server
-    const response = await fetch("/api/save-key", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
-    });
+    try {
+      const response = await fetch("/api/save-key", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
+      });
 
-    if (response.ok) {
-      setKey(newKey);
-      setExpiry(expiryDate.toLocaleString());
-      localStorage.setItem("key", newKey);
-      localStorage.setItem("expiry", expiryDate.toISOString());
-    } else {
+      if (response.ok) {
+        setKey(newKey);
+        setExpiry(expiryDate.toLocaleString());
+        localStorage.setItem("key", newKey);
+        localStorage.setItem("expiry", expiryDate.toISOString());
+      } else {
+        const errorData = await response.json();
+        console.error("Server error:", errorData);
+        toast.error("Failed to save the key on the server.");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
       toast.error("Failed to save the key on the server.");
     }
   };
