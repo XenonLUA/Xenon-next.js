@@ -1,33 +1,32 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 
 type ValidKeys = {
 	[key: string]: string;
 };
 
-// Simple in-memory storage
+// Assume the same in-memory storage from save-key
 let validKeys: ValidKeys = {
 	"exampleKey1": "2024-12-31T23:59:59Z",
 	"exampleKey2": "2025-01-31T23:59:59Z"
 };
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-	if (req.method !== 'POST') {
-		res.setHeader('Allow', ['POST']);
-		res.status(405).json({ message: 'Method not allowed' });
-		return;
-	}
+export async function POST(req: NextRequest) {
+	try {
+		const { key } = await req.json();
 
-	const { key } = req.body;
+		if (typeof key !== 'string') {
+			return NextResponse.json({ message: 'Key must be a string' }, { status: 400 });
+		}
 
-	if (!key) {
-		res.status(400).json({ message: 'Key is required' });
-		return;
-	}
+		const expiry = validKeys[key];
 
-	const expiry = validKeys[key];
-	if (expiry && new Date(expiry) > new Date()) {
-		res.status(200).json({ valid: true });
-	} else {
-		res.status(200).json({ valid: false });
+		if (!expiry) {
+			return NextResponse.json({ message: 'Invalid key' }, { status: 400 });
+		}
+
+		return NextResponse.json({ message: 'Key is valid', expiry }, { status: 200 });
+	} catch (error) {
+		console.error('Error validating key:', error);
+		return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 	}
 }
