@@ -7,7 +7,6 @@ import * as React from "react";
 import { ReactTyped } from "react-typed";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-const cors = require("cors");
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import {
@@ -23,8 +22,8 @@ import {
 
 export default function Home() {
   const [progress, setProgress] = React.useState(13);
-  const [key, setKey] = React.useState(null);
-  const [expiry, setExpiry] = React.useState(null);
+  const [key, setKey] = React.useState<string | null>(null);
+  const [expiry, setExpiry] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -52,7 +51,7 @@ export default function Home() {
           return prevProgress;
         }
       });
-    }, 100); // Set interval to match typeSpeed (100ms)
+    }, 100);
 
     return () => clearInterval(interval);
   };
