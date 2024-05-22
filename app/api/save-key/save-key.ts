@@ -1,9 +1,13 @@
 // pages/api/save-key.js
 import { NextApiRequest, NextApiResponse } from 'next';
 
-let validKeys = {}; // Penyimpanan dalam memori sederhana
+type ValidKeys = {
+	[key: string]: string;
+};
 
-export default function handler(req, res) {
+let validKeys: ValidKeys = {}; // Penyimpanan dalam memori sederhana
+
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== 'POST') {
 		res.status(405).json({ message: 'Method not allowed' });
 		return;
