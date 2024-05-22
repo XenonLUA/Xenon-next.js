@@ -1,33 +1,34 @@
-// app/api/validate-key/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { clientPromise } from '@/lib/mongodb'; // Perhatikan penggunaan {}
 
 export async function POST(req: NextRequest) {
 	try {
-		const { key } = await req.json();
+		const { key, expiry } = await req.json();
 
-		if (typeof key !== 'string') {
-			return NextResponse.json({ valid: false, message: 'Key must be a string' }, { status: 400 });
+		console.log("Received request with key:", key, "and expiry:", expiry);
+
+		if (typeof key !== 'string' || typeof expiry !== 'string') {
+			console.log("Invalid key or expiry format");
+			return NextResponse.json({ message: 'Key and expiry must be strings' }, { status: 400 });
+		}
+
+		if (isNaN(Date.parse(expiry))) {
+			console.log("Invalid expiry date format");
+			return NextResponse.json({ message: 'Expiry must be a valid date' }, { status: 400 });
 		}
 
 		const client = await clientPromise;
 		const db = client.db(process.env.MONGODB_DB);
 		const collection = db.collection('validKeys');
 
-		const keyRecord = await collection.findOne({ key });
+		console.log("Connected to database:", process.env.MONGODB_DB);
 
-		if (keyRecord && new Date(keyRecord.expiry) > new Date()) {
-			return NextResponse.json({ valid: true }, { status: 200 });
-		} else {
-			return NextResponse.json({ valid: false }, { status: 200 });
-		}
+		const result = await collection.insertOne({ key, expiry });
+
+		console.log("Saved key:", key, "Expiry:", expiry, "Result:", result);
+		return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
 	} catch (error) {
-		console.error('Error validating key:', error);
-
-		if (error instanceof SyntaxError) {
-			return NextResponse.json({ message: 'Invalid JSON format' }, { status: 400 });
-		}
-
+		console.error('Error saving key:', error);
 		return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 	}
 }
