@@ -1,3 +1,4 @@
+// app/api/save-key/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
 type ValidKeys = {
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		validKeys[key] = expiry;
+		console.log("Saved key:", key, "Expiry:", expiry);
 		return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
 	} catch (error) {
 		console.error('Error saving key:', error);
