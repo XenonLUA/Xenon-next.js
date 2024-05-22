@@ -43,14 +43,9 @@ export default function Home() {
   };
 
   const generateKey = async () => {
-    const newKey =
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    const newKey = generateRandomKey();
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
-
-    console.log("Generating new key:", newKey);
-    console.log("Expiry date:", expiryDate.toISOString());
 
     try {
       const response = await fetch("/api/save-key", {
@@ -61,11 +56,8 @@ export default function Home() {
         body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
       });
 
-      console.log("Fetch response:", response);
-
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Response data:", responseData);
         setKey(newKey);
         setExpiry(expiryDate.toLocaleString());
         localStorage.setItem("key", newKey);
@@ -73,13 +65,26 @@ export default function Home() {
         toast.success("Key saved successfully.");
       } else {
         const errorData = await response.json();
-        console.error("Server error:", errorData);
-        toast.error("Failed to save the key on the server.");
+        toast.error(
+          `Failed to save the key on the server: ${errorData.message}`
+        );
       }
     } catch (error) {
-      console.error("Fetch error:", error);
-      toast.error("Failed to save the key on the server.");
+      if (error instanceof Error) {
+        toast.error(`Failed to save the key on the server: ${error.message}`);
+      } else {
+        toast.error(
+          "Failed to save the key on the server due to an unknown error."
+        );
+      }
     }
+  };
+
+  const generateRandomKey = () => {
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    );
   };
 
   const copyToClipboard = () => {
