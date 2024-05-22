@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 
 export default function Home() {
-  const [progress, setProgress] = React.useState(13);
+  const [progress, setProgress] = React.useState(0);
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
 
@@ -52,8 +52,6 @@ export default function Home() {
         }
       });
     }, 100);
-
-    return () => clearInterval(interval);
   };
 
   const generateKey = async () => {
@@ -63,19 +61,23 @@ export default function Home() {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
 
-    // Simpan kunci di server
-    await fetch("/api/save-key", {
+    // Save key to the server
+    const response = await fetch("/api/save-key", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ key: newKey, expiry: expiryDate.toString() }),
+      body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
     });
 
-    setKey(newKey);
-    setExpiry(expiryDate.toLocaleString());
-    localStorage.setItem("key", newKey);
-    localStorage.setItem("expiry", expiryDate.toString());
+    if (response.ok) {
+      setKey(newKey);
+      setExpiry(expiryDate.toLocaleString());
+      localStorage.setItem("key", newKey);
+      localStorage.setItem("expiry", expiryDate.toISOString());
+    } else {
+      toast.error("Failed to save the key on the server.");
+    }
   };
 
   const copyToClipboard = () => {
@@ -109,9 +111,9 @@ export default function Home() {
 
             <div>
               <h1 className="mt-8 text-3xl font-extrabold tracking-tight lg:text-6xl"></h1>
-              <a className="max-w-xl mx-auto mt-8 text-base lg:text-xl text-secondary-foreground">
+              <div className="max-w-xl mx-auto mt-8 text-base lg:text-xl text-secondary-foreground">
                 <Progress value={progress} />
-              </a>
+              </div>
             </div>
             {progress === 100 && key && (
               <div className="flex justify-center max-w-sm mx-auto mt-10">

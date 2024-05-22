@@ -1,20 +1,29 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-// Data storage for keys (temporary solution)
-let validKeys: { [key: string]: string } = {};
+type ValidKeys = {
+	[key: string]: string;
+};
+
+// Simple in-memory storage
+let validKeys: ValidKeys = {
+	"exampleKey1": "2024-12-31T23:59:59Z",
+	"exampleKey2": "2025-01-31T23:59:59Z"
+};
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== 'POST') {
-		return res.status(405).json({ message: 'Method not allowed' });
+		res.setHeader('Allow', ['POST']);
+		res.status(405).json({ message: 'Method not allowed' });
+		return;
 	}
 
 	const { key, expiry } = req.body;
 
 	if (!key || !expiry) {
-		return res.status(400).json({ message: 'Key and expiry are required' });
+		res.status(400).json({ message: 'Key and expiry are required' });
+		return;
 	}
 
 	validKeys[key] = expiry;
-
-	return res.status(200).json({ message: 'Key saved successfully' });
+	res.status(200).json({ message: 'Key saved successfully' });
 }

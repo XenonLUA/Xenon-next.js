@@ -1,14 +1,18 @@
-// pages/api/validate-key.js
 import { NextApiRequest, NextApiResponse } from 'next';
 
 type ValidKeys = {
   [key: string]: string;
 };
 
-let validKeys: ValidKeys = {}; // Penyimpanan dalam memori sederhana
+// Simple in-memory storage
+let validKeys: ValidKeys = {
+  "exampleKey1": "2024-12-31T23:59:59Z",
+  "exampleKey2": "2025-01-31T23:59:59Z"
+};
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
     res.status(405).json({ message: 'Method not allowed' });
     return;
   }
