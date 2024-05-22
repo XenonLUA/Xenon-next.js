@@ -67,7 +67,7 @@ export default function Home() {
         body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
       });
 
-      console.log("Fetch response:", response);
+      console.log("Fetch response status:", response.status);
 
       if (response.ok) {
         const responseData = await response.json();
