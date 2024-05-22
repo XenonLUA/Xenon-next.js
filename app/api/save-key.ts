@@ -19,11 +19,21 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 	const { key, expiry } = req.body;
 
-	if (!key || !expiry) {
-		res.status(400).json({ message: 'Key and expiry are required' });
+	if (typeof key !== 'string' || typeof expiry !== 'string') {
+		res.status(400).json({ message: 'Key and expiry must be strings' });
 		return;
 	}
 
-	validKeys[key] = expiry;
-	res.status(200).json({ message: 'Key saved successfully' });
+	if (isNaN(Date.parse(expiry))) {
+		res.status(400).json({ message: 'Expiry must be a valid date' });
+		return;
+	}
+
+	try {
+		validKeys[key] = expiry;
+		res.status(200).json({ message: 'Key saved successfully' });
+	} catch (error) {
+		console.error('Error saving key:', error);
+		res.status(500).json({ message: 'Internal server error' });
+	}
 }
