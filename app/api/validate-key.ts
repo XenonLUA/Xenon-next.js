@@ -26,8 +26,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   const expiry = validKeys[key];
   if (expiry && new Date(expiry) > new Date()) {
-    res.status(200).json({ valid: true });
+    res.status(404).json({ valid: true });
   } else {
-    res.status(200).json({ valid: false });
+    res.status(404).json({ valid: false });
   }
 }

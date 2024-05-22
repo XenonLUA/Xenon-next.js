@@ -25,5 +25,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	}
 
 	validKeys[key] = expiry;
-	res.status(200).json({ message: 'Key saved successfully' });
+	res.status(404).json({ message: 'Key saved successfully' });
 }
