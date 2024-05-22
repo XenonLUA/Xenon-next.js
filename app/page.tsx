@@ -61,6 +61,9 @@ export default function Home() {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
 
+    console.log("Generating new key:", newKey);
+    console.log("Expiry date:", expiryDate.toISOString());
+
     try {
       const response = await fetch("/api/save-key", {
         method: "POST",
@@ -70,11 +73,16 @@ export default function Home() {
         body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
       });
 
+      console.log("Fetch response:", response);
+
       if (response.ok) {
+        const responseData = await response.json();
+        console.log("Response data:", responseData);
         setKey(newKey);
         setExpiry(expiryDate.toLocaleString());
         localStorage.setItem("key", newKey);
         localStorage.setItem("expiry", expiryDate.toISOString());
+        toast.success("Key saved successfully.");
       } else {
         const errorData = await response.json();
         console.error("Server error:", errorData);

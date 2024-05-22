@@ -17,6 +17,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 		return;
 	}
 
+	console.log("Received request:", req.body);
+
 	const { key, expiry } = req.body;
 
 	if (typeof key !== 'string' || typeof expiry !== 'string') {
@@ -31,6 +33,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 	try {
 		validKeys[key] = expiry;
+		console.log("Key saved:", { key, expiry });
 		res.status(200).json({ message: 'Key saved successfully' });
 	} catch (error) {
 		console.error('Error saving key:', error);
