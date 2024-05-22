@@ -1,26 +1,20 @@
-// pages/api/save-key.js
 import { NextApiRequest, NextApiResponse } from 'next';
 
-type ValidKeys = {
-	[key: string]: string;
-};
-
-let validKeys: ValidKeys = {}; // Penyimpanan dalam memori sederhana
+// Data storage for keys (temporary solution)
+let validKeys: { [key: string]: string } = {};
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	if (req.method !== 'POST') {
-		res.status(405).json({ message: 'Method not allowed' });
-		return;
+		return res.status(405).json({ message: 'Method not allowed' });
 	}
 
 	const { key, expiry } = req.body;
 
 	if (!key || !expiry) {
-		res.status(400).json({ message: 'Key and expiry are required' });
-		return;
+		return res.status(400).json({ message: 'Key and expiry are required' });
 	}
 
 	validKeys[key] = expiry;
 
-	res.status(200).json({ message: 'Key saved successfully' });
+	return res.status(200).json({ message: 'Key saved successfully' });
 }
