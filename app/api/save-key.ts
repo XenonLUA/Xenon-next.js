@@ -20,10 +20,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { key, expiry } = req.body;
 
 	if (!key || !expiry) {
-		res.status(404).json({ message: 'Key and expiry are required' });
+		res.status(400).json({ message: 'Key and expiry are required' });
 		return;
 	}
 
 	validKeys[key] = expiry;
-	res.status(404).json({ message: 'Key saved successfully' });
+	res.status(200).json({ message: 'Key saved successfully' });
 }
