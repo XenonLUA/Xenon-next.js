@@ -1,3 +1,4 @@
+// /app/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,13 @@ import { ReactTyped } from "react-typed";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const generateRandomKey = () => {
+  return (
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+};
 
 export default function Home() {
   const [progress, setProgress] = React.useState(0);
@@ -47,6 +55,9 @@ export default function Home() {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
 
+    console.log("Generating new key:", newKey);
+    console.log("Expiry date:", expiryDate.toISOString());
+
     try {
       const response = await fetch("/api/save-key", {
         method: "POST",
@@ -56,8 +67,11 @@ export default function Home() {
         body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
       });
 
+      console.log("Fetch response:", response);
+
       if (response.ok) {
         const responseData = await response.json();
+        console.log("Response data:", responseData);
         setKey(newKey);
         setExpiry(expiryDate.toLocaleString());
         localStorage.setItem("key", newKey);
@@ -65,26 +79,13 @@ export default function Home() {
         toast.success("Key saved successfully.");
       } else {
         const errorData = await response.json();
-        toast.error(
-          `Failed to save the key on the server: ${errorData.message}`
-        );
+        console.error("Server error:", errorData);
+        toast.error("Failed to save the key on the server.");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        toast.error(`Failed to save the key on the server: ${error.message}`);
-      } else {
-        toast.error(
-          "Failed to save the key on the server due to an unknown error."
-        );
-      }
+      console.error("Fetch error:", error);
+      toast.error("Failed to save the key on the server.");
     }
-  };
-
-  const generateRandomKey = () => {
-    return (
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15)
-    );
   };
 
   const copyToClipboard = () => {
