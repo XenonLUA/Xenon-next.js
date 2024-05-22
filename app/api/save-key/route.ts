@@ -17,14 +17,12 @@ export async function POST(req: NextRequest) {
 		const db = client.db(process.env.MONGODB_DB);
 		const collection = db.collection('validKeys');
 
-		const result = await collection.insertOne({ key, expiry });
+		await collection.insertOne({ key, expiry });
 
-		if (result.acknowledged) {
-			return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
-		} else {
-			return NextResponse.json({ message: 'Failed to save the key' }, { status: 500 });
-		}
+		console.log("Saved key:", key, "Expiry:", expiry);
+		return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
 	} catch (error) {
+		console.error('Error saving key:', error);
 		return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 	}
 }
