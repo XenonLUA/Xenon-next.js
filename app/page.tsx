@@ -5,25 +5,92 @@ import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
 import * as React from "react";
 import { ReactTyped } from "react-typed";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const cors = require("cors");
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Home() {
   const [progress, setProgress] = React.useState(13);
+  const [key, setKey] = React.useState(null);
+  const [expiry, setExpiry] = React.useState(null);
 
   React.useEffect(() => {
+    const storedKey = localStorage.getItem("key");
+    const storedExpiry = localStorage.getItem("expiry");
+
+    if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
+      setKey(storedKey);
+      setExpiry(new Date(storedExpiry).toLocaleString());
+      setProgress(100);
+    } else {
+      localStorage.removeItem("key");
+      localStorage.removeItem("expiry");
+      startProgress();
+    }
+  }, []);
+
+  const startProgress = () => {
     const interval = setInterval(() => {
       setProgress((prevProgress) => {
         if (prevProgress < 100) {
           return prevProgress + 1;
         } else {
           clearInterval(interval);
+          generateKey();
           return prevProgress;
         }
       });
-    }, 100); // Set interval to match typeSpeed (1000ms)
+    }, 100); // Set interval to match typeSpeed (100ms)
 
     return () => clearInterval(interval);
-  }, []);
+  };
+
+  const generateKey = async () => {
+    const newKey =
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15);
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 1);
+
+    // Simpan kunci di server
+    await fetch("/api/save-key", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ key: newKey, expiry: expiryDate.toString() }),
+    });
+
+    setKey(newKey);
+    setExpiry(expiryDate.toLocaleString());
+    localStorage.setItem("key", newKey);
+    localStorage.setItem("expiry", expiryDate.toString());
+  };
+
+  const copyToClipboard = () => {
+    if (key) {
+      navigator.clipboard.writeText(key).then(
+        () => {
+          toast.success("Key copied to clipboard!");
+        },
+        () => {
+          toast.error("Failed to copy the key.");
+        }
+      );
+    }
+  };
 
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
@@ -33,7 +100,7 @@ export default function Home() {
             <span className="w-auto px-6 py-3 rounded-full bg-secondary">
               <span className="text-sm font-medium text-primary text-[#3838ff]">
                 <ReactTyped
-                  strings={["XENON SHOP"]}
+                  strings={["XENON HUB"]}
                   typeSpeed={300}
                   backSpeed={150}
                   loop
@@ -47,18 +114,28 @@ export default function Home() {
                 <Progress value={progress} />
               </a>
             </div>
-            {progress === 100 && (
+            {progress === 100 && key && (
               <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Link href="/dashboard">
-                  <Button size="lg" className="w-full ">
-                    Dashboard
-                  </Button>
-                </Link>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>YOUR KEY</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col items-center">
+                      <p>{key}</p>
+                      <p>Expires on: {expiry}</p>
+                      <Button onClick={copyToClipboard} className="mt-4">
+                        Copy Key
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
         </div>
       </div>
+      <ToastContainer />
     </section>
   );
 }

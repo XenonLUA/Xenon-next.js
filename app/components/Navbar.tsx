@@ -11,7 +11,7 @@ export function Navbar() {
         <Link href="/">
           <h1 className="font-bold text-3xl text-primary">
             <ReactTyped
-              strings={["Xenon", "Next.Js", "React."]}
+              strings={["Xenon HUB"]}
               typeSpeed={120}
               backSpeed={50}
               loop
