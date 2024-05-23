@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { createClient } from "@supabase/supabase-js";
-import { generateRandomKey } from "./utils";
+import { generateRandomKey } from "./utils"; // Pastikan jalurnya benar
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
