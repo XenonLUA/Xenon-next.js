@@ -80,7 +80,7 @@ export default function Home() {
       } else {
         const errorData = await response.json();
         console.error("Server error:", errorData);
-        toast.error("Failed to save the key on the server.");
+        toast.error(`Failed to save the key: ${errorData.message}`);
       }
     } catch (error) {
       console.error("Fetch error:", error);

@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientPromise } from '@/lib/mongodb'; // Perhatikan penggunaan {}
+import { clientPromise } from '@/lib/mongodb';
 
 export async function POST(req: NextRequest) {
 	try {
 		const { key, expiry } = await req.json();
-
 		console.log("Received request with key:", key, "and expiry:", expiry);
 
 		if (typeof key !== 'string' || typeof expiry !== 'string') {
@@ -12,7 +11,8 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ message: 'Key and expiry must be strings' }, { status: 400 });
 		}
 
-		if (isNaN(Date.parse(expiry))) {
+		const expiryDate = new Date(expiry);
+		if (isNaN(expiryDate.getTime())) {
 			console.log("Invalid expiry date format");
 			return NextResponse.json({ message: 'Expiry must be a valid date' }, { status: 400 });
 		}
