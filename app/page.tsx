@@ -126,6 +126,17 @@ const Home: React.FC = () => {
     generateKey();
   };
 
+  const loadLinkvertiseScript = () => {
+    return new Promise<void>((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://publisher.linkvertise.com/cdn/linkvertise.js";
+      script.onload = () => resolve();
+      script.onerror = () =>
+        reject(new Error("Failed to load Linkvertise script"));
+      document.body.appendChild(script);
+    });
+  };
+
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
@@ -152,20 +163,19 @@ const Home: React.FC = () => {
               <div className="flex justify-center max-w-sm mx-auto mt-10">
                 <Button
                   onClick={() => {
-                    // Trigger Linkvertise and wait for completion
-                    const script = document.createElement("script");
-                    script.src =
-                      "https://publisher.linkvertise.com/cdn/linkvertise.js";
-                    script.onload = () => {
-                      // @ts-ignore
-                      linkvertise(1092296, {
-                        whitelist: [""],
-                        blacklist: [],
-                      }).then(() => {
-                        handleLinkvertiseCompletion();
+                    loadLinkvertiseScript()
+                      .then(() => {
+                        // @ts-ignore
+                        linkvertise(1092296, {
+                          whitelist: [""],
+                          blacklist: [],
+                        }).then(() => {
+                          handleLinkvertiseCompletion();
+                        });
+                      })
+                      .catch((error) => {
+                        toast.error(error.message);
                       });
-                    };
-                    document.body.appendChild(script);
                   }}
                 >
                   Unlock Key
