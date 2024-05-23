@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
 		const verificationData = await verificationResponse.json();
 
 		if (verificationData.success) {
+			await supabase.from("tokens").update({ status: "completed" }).eq("token", token);
 			return NextResponse.json({ success: true });
 		} else {
 			return NextResponse.json({ success: false, message: "Invalid token" }, { status: 400 });
