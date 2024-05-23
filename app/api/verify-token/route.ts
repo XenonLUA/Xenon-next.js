@@ -1,5 +1,7 @@
+// /pages/api/verify-token/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
-import { supabase } from "@/lib/utils"; // Adjust the import path as needed
+import { supabase } from "@/lib/utils"; // Sesuaikan jalur impor jika perlu
 
 export async function GET(req: NextRequest) {
 	const { searchParams } = new URL(req.url);
@@ -10,6 +12,7 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
+		// Ambil token dari Supabase
 		const { data: tokenData, error } = await supabase
 			.from("tokens")
 			.select("token, status")
@@ -25,16 +28,10 @@ export async function GET(req: NextRequest) {
 			return NextResponse.json({ success: false, message: "Token already used or invalid" }, { status: 400 });
 		}
 
-		// Verify the token with Linkvertise (mocked for example)
-		const verificationResponse = await fetch(`https://linkvertise-api-endpoint/verify?token=${token}`);
-		const verificationData = await verificationResponse.json();
+		// Update status token di Supabase
+		await supabase.from("tokens").update({ status: "completed" }).eq("token", token);
+		return NextResponse.json({ success: true });
 
-		if (verificationData.success) {
-			await supabase.from("tokens").update({ status: "completed" }).eq("token", token);
-			return NextResponse.json({ success: true });
-		} else {
-			return NextResponse.json({ success: false, message: "Invalid token" }, { status: 400 });
-		}
 	} catch (error) {
 		console.error("Error verifying token:", error);
 		return NextResponse.json({ success: false, message: "Error verifying token" }, { status: 500 });
