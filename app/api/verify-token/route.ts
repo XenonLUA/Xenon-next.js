@@ -1,49 +1,42 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/utils"; // Adjust the import path as needed
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { token } = req.query;
+export async function GET(req: NextRequest) {
+	const { searchParams } = new URL(req.url);
+	const token = searchParams.get("token");
 
 	if (!token) {
-		return res.status(400).json({ success: false, message: "No token provided" });
+		return NextResponse.json({ success: false, message: "No token provided" }, { status: 400 });
 	}
 
 	try {
-		const { data, error } = await supabase
+		const { data: tokenData, error } = await supabase
 			.from("tokens")
 			.select("token, status")
 			.eq("token", token)
 			.single();
 
-		if (error || !data) {
+		if (error || !tokenData) {
 			console.error("Supabase fetch error:", error);
-			return res.status(404).json({ success: false, message: "Token not found" });
+			return NextResponse.json({ success: false, message: "Token not found" }, { status: 404 });
 		}
 
-		if (data.status !== "pending") {
-			return res.status(400).json({ success: false, message: "Token already used or invalid" });
+		if (tokenData.status !== "pending") {
+			return NextResponse.json({ success: false, message: "Token already used or invalid" }, { status: 400 });
 		}
 
-		// Mock verification response from Linkvertise
-		const verificationResponse = { success: true };
+		// Verify the token with Linkvertise (mocked for example)
+		const verificationResponse = await fetch(`https://linkvertise-api-endpoint/verify?token=${token}`);
+		const verificationData = await verificationResponse.json();
 
-		if (verificationResponse.success) {
-			const { error: updateError } = await supabase
-				.from("tokens")
-				.update({ status: "completed" })
-				.eq("token", token);
-
-			if (updateError) {
-				console.error("Supabase update error:", updateError);
-				return res.status(500).json({ success: false, message: "Failed to update token status" });
-			}
-
-			return res.status(200).json({ success: true });
+		if (verificationData.success) {
+			await supabase.from("tokens").update({ status: "completed" }).eq("token", token);
+			return NextResponse.json({ success: true });
 		} else {
-			return res.status(400).json({ success: false, message: "Invalid token" });
+			return NextResponse.json({ success: false, message: "Invalid token" }, { status: 400 });
 		}
 	} catch (error) {
 		console.error("Error verifying token:", error);
-		return res.status(500).json({ success: false, message: "Error verifying token" });
+		return NextResponse.json({ success: false, message: "Error verifying token" }, { status: 500 });
 	}
 }
