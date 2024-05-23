@@ -1,3 +1,4 @@
+// Home.tsx
 "use client";
 
 import * as React from "react";
@@ -7,17 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
-import { createClient } from "@supabase/supabase-js";
-import { generateRandomKey } from "@/components/ui/utils"; // Pastikan jalurnya benar
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase environment variables");
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { generateRandomKey, supabase } from "@/components/ui/utils";
 
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
