@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock token store (in-memory)
-const validTokens: Set<string> = new Set(['valid-token']);
+const validTokens: Set<string> = new Set(['valid-token']); // Add the generated tokens here
 
 export async function GET(req: NextRequest) {
 	const { searchParams } = new URL(req.url);
