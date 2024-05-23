@@ -138,7 +138,7 @@ const Home: React.FC = () => {
 
   const fetchTokenAndRedirect = async () => {
     try {
-      const response = await fetch("/generate-token");
+      const response = await fetch("/api/generate-token");
       const data = await response.json();
       return data.token;
     } catch (error) {
@@ -170,7 +170,7 @@ const Home: React.FC = () => {
     const token = localStorage.getItem("linkvertiseToken");
     if (token) {
       try {
-        const response = await fetch(`/verify-token?token=${token}`);
+        const response = await fetch(`/api/verify-token?token=${token}`);
         const data = await response.json();
         if (data.success) {
           localStorage.removeItem("linkvertiseToken");
