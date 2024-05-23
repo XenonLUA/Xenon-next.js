@@ -8,7 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
-import { generateRandomKey, supabase } from "@/components/ui/utils";
+import { generateRandomKey, supabase } from "./utils";
 
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
