@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { generateRandomKey, supabase } from "../lib/utils";
 
-// Deklarasi global untuk linkvertise
+// Declare global for linkvertise
 declare global {
   interface Window {
     linkvertise: any;
@@ -144,22 +142,21 @@ const Home: React.FC = () => {
     });
   };
 
+  const linkvertise = (link: string, userid: number) => {
+    const base_url = `https://linkvertise.com/${userid}/dynamic`;
+    const encodedLink = encodeURIComponent(link);
+    const href = `${base_url}?r=${encodedLink}`;
+    return href;
+  };
+
   const unlockKey = () => {
     loadLinkvertiseScript()
       .then(() => {
         if (typeof window.linkvertise === "function") {
-          window
-            .linkvertise(1092296, {
-              whitelist: ["https://xenon-next-js-seven.vercel.app/"],
-              blacklist: [],
-            })
-            .then(() => {
-              handleLinkvertiseCompletion();
-            })
-            .catch((error: any) => {
-              console.error("Linkvertise error:", error);
-              toast.error("Linkvertise error occurred.");
-            });
+          const link = "https://xenon-next-js-seven.vercel.app/key";
+          const userid = 1092296; // Replace with your Linkvertise user ID
+          const linkvertiseUrl = linkvertise(link, userid);
+          window.location.href = linkvertiseUrl;
         } else {
           throw new Error("Linkvertise is not defined");
         }
