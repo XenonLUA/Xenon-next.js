@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clientPromise } from '@/lib/mongodb';
-import { MongoClient } from 'mongodb';
+import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -18,15 +17,15 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ message: 'Expiry must be a valid date' }, { status: 400 });
 		}
 
-		const client: MongoClient = await clientPromise;
-		const db = client.db(process.env.MONGODB_DB);
-		const collection = db.collection('validKeys');
+		const { data, error } = await supabase
+			.from('valid_keys')
+			.insert([{ key, expiry: expiryDate.toISOString() }]);
 
-		console.log("Connected to database:", process.env.MONGODB_DB);
+		if (error) {
+			throw error;
+		}
 
-		const result = await collection.insertOne({ key, expiry });
-
-		console.log("Saved key:", key, "Expiry:", expiry, "Result:", result);
+		console.log("Saved key:", key, "Expiry:", expiry, "Result:", data);
 		return NextResponse.json({ message: 'Key saved successfully' }, { status: 200 });
 	} catch (error) {
 		console.error('Error saving key:', error);

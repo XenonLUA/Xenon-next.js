@@ -7,6 +7,16 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Missing Supabase environment variables");
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const generateRandomKey = (): string => {
   return (
@@ -58,31 +68,21 @@ const Home: React.FC = () => {
     console.log("Expiry date:", expiryDate.toISOString());
 
     try {
-      const response = await fetch("/api/save-key", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ key: newKey, expiry: expiryDate.toISOString() }),
-      });
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .insert([{ key: newKey, expiry: expiryDate.toISOString() }]);
 
-      console.log("Fetch response:", response);
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Response data:", responseData);
-        setKey(newKey);
-        setExpiry(expiryDate.toLocaleString());
-        localStorage.setItem("key", newKey);
-        localStorage.setItem("expiry", expiryDate.toISOString());
-        toast.success("Key saved successfully.");
-      } else {
-        const errorData = await response.text();
-        console.error("Server error:", errorData);
-        toast.error(`Failed to save the key: ${errorData}`);
+      if (error) {
+        throw error;
       }
+
+      setKey(newKey);
+      setExpiry(expiryDate.toLocaleString());
+      localStorage.setItem("key", newKey);
+      localStorage.setItem("expiry", expiryDate.toISOString());
+      toast.success("Key saved successfully.");
     } catch (error) {
-      console.error("Fetch error:", error);
+      console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
     }
   };

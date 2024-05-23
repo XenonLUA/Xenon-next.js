@@ -18,7 +18,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.3.0",
-    "@supabase/supabase-js": "^2.42.7",
+    "@supabase/supabase-js": "^2.43.4",
     "@types/react-bootstrap": "^0.32.36",
     "@types/react-router-dom": "^5.3.3",
     "bootstrap": "^5.3.3",
