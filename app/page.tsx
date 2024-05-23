@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReactTyped } from "react-typed"; // Adjust import if needed
+import { ReactTyped } from "react-typed";
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
