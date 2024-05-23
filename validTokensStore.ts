@@ -1,4 +1,3 @@
-// validTokensStore.ts
 let validTokens = new Set<string>();
 
 export function addToken(token: string) {

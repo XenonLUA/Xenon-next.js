@@ -173,16 +173,20 @@ const Home: React.FC = () => {
         const response = await fetch(`/api/verify-token?token=${token}`);
         const data = await response.json();
         if (data.success) {
+          console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
           window.location.reload();
         } else {
+          console.error("Token verification failed:", data.message);
           toast.error("Token verification failed.");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token.");
       }
+    } else {
+      console.error("No token found in localStorage.");
     }
   };
 
