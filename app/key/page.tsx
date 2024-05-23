@@ -7,17 +7,26 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
-import { generateRandomKey, supabase } from "../lib/utils";
+import { createClient } from "@supabase/supabase-js";
 
-// Declare global for linkvertise
-declare global {
-  interface Window {
-    linkvertise: any;
-  }
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Missing Supabase environment variables");
 }
 
-const Home: React.FC = () => {
-  const [progress, setProgress] = React.useState<number>(0);
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const generateRandomKey = (): string => {
+  return (
+    "XENONHUB_" +
+    Math.random().toString(36).substring(2, 15) +
+    Math.random().toString(36).substring(2, 15)
+  );
+};
+
+const KeyPage: React.FC = () => {
   const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
@@ -30,31 +39,17 @@ const Home: React.FC = () => {
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       setKey(storedKey);
       setExpiry(storedExpiry);
-      setProgress(100);
       const expiryDate = new Date(storedExpiry);
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
-      startProgress();
+      generateKey();
     }
   }, []);
 
-  const startProgress = () => {
-    const interval = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress < 100) {
-          return prevProgress + 1;
-        } else {
-          clearInterval(interval);
-          return prevProgress;
-        }
-      });
-    }, 100);
-  };
-
-  const updateExpiryProgress = React.useCallback((expiryDate: Date) => {
+  const updateExpiryProgress = (expiryDate: Date) => {
     const totalDuration = expiryDate.getTime() - new Date().getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
@@ -73,7 +68,7 @@ const Home: React.FC = () => {
         updateTimeRemaining(expiryDate);
       }
     }, 1000);
-  }, []);
+  };
 
   const updateTimeRemaining = (expiryDate: Date) => {
     const now = new Date().getTime();
@@ -100,11 +95,8 @@ const Home: React.FC = () => {
         .insert([{ key: newKey, expiry: expiryDate.toISOString() }]);
 
       if (error) {
-        console.error("Supabase error:", error);
         throw error;
       }
-
-      console.log("Supabase response data:", data);
 
       setKey(newKey);
       setExpiry(expiryDate.toISOString());
@@ -132,21 +124,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const linkvertise = (link: string, userid: number) => {
-    const base_url = `https://link-to.net/${userid}/${
-      Math.random() * 1000
-    }/dynamic`;
-    const href = base_url + "?r=" + btoa(encodeURI(link));
-    return href;
-  };
-
-  const unlockKey = () => {
-    const link = "https://xenon-next-js-seven.vercel.app/Key";
-    const userid = 1092296; // Replace with your Linkvertise user ID
-    const linkvertiseUrl = linkvertise(link, userid);
-    window.location.href = linkvertiseUrl;
-  };
-
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
@@ -166,38 +143,35 @@ const Home: React.FC = () => {
             <div>
               <h1 className="mt-8 text-3xl font-extrabold tracking-tight lg:text-6xl"></h1>
               <div className="max-w-xl mx-auto mt-8 text-base lg:text-xl text-secondary-foreground">
-                <Progress value={progress} />
+                {key && (
+                  <div className="flex justify-center max-w-sm mx-auto mt-10">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>YOUR KEY</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col items-center">
+                          <p>{key}</p>
+                          <p>
+                            Expires on:{" "}
+                            {new Date(expiry || "").toLocaleString()}
+                          </p>
+                          <p className="mt-2">
+                            Time remaining: {timeRemaining}
+                          </p>
+                          <div className="w-full mt-2">
+                            <Progress value={expiryProgress} />
+                          </div>
+                          <Button onClick={copyToClipboard} className="mt-4">
+                            Copy Key
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </div>
             </div>
-            {progress === 100 && !key && (
-              <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Button onClick={unlockKey}>Unlock Key</Button>
-              </div>
-            )}
-            {progress === 100 && key && (
-              <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>YOUR KEY</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col items-center">
-                      <p>{key}</p>
-                      <p>
-                        Expires on: {new Date(expiry || "").toLocaleString()}
-                      </p>
-                      <p className="mt-2">Time remaining: {timeRemaining}</p>
-                      <div className="w-full mt-2">
-                        <Progress value={expiryProgress} />
-                      </div>
-                      <Button onClick={copyToClipboard} className="mt-4">
-                        Copy Key
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -206,4 +180,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default KeyPage;
