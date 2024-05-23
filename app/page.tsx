@@ -6,7 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReactTyped } from "react-typed";
+import { ReactTyped } from "react-typed"; // Adjust import if needed
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -27,6 +27,8 @@ const generateRandomKey = (): string => {
 
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
+  const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
+  const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
 
@@ -36,8 +38,11 @@ const Home: React.FC = () => {
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       setKey(storedKey);
-      setExpiry(new Date(storedExpiry).toLocaleString());
+      setExpiry(storedExpiry);
       setProgress(100);
+      const expiryDate = new Date(storedExpiry);
+      updateExpiryProgress(expiryDate);
+      updateTimeRemaining(expiryDate);
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -59,6 +64,38 @@ const Home: React.FC = () => {
     }, 100);
   };
 
+  const updateExpiryProgress = (expiryDate: Date) => {
+    const totalDuration = expiryDate.getTime() - new Date().getTime();
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const timeRemaining = expiryDate.getTime() - now;
+      const newProgress = (timeRemaining / totalDuration) * 100;
+      setExpiryProgress(newProgress > 0 ? newProgress : 0);
+
+      if (timeRemaining <= 0) {
+        clearInterval(interval);
+        setKey(null);
+        setExpiry(null);
+        localStorage.removeItem("key");
+        localStorage.removeItem("expiry");
+        toast.error("Key has expired.");
+      } else {
+        updateTimeRemaining(expiryDate);
+      }
+    }, 1000);
+  };
+
+  const updateTimeRemaining = (expiryDate: Date) => {
+    const now = new Date().getTime();
+    const timeRemaining = expiryDate.getTime() - now;
+    const seconds = Math.floor((timeRemaining / 1000) % 60);
+    const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+    const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+
+    setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+  };
+
   const generateKey = async () => {
     const newKey = generateRandomKey();
     const expiryDate = new Date();
@@ -77,10 +114,12 @@ const Home: React.FC = () => {
       }
 
       setKey(newKey);
-      setExpiry(expiryDate.toLocaleString());
+      setExpiry(expiryDate.toISOString());
       localStorage.setItem("key", newKey);
       localStorage.setItem("expiry", expiryDate.toISOString());
       toast.success("Key saved successfully.");
+      updateExpiryProgress(expiryDate);
+      updateTimeRemaining(expiryDate);
     } catch (error) {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
@@ -131,7 +170,13 @@ const Home: React.FC = () => {
                   <CardContent>
                     <div className="flex flex-col items-center">
                       <p>{key}</p>
-                      <p>Expires on: {expiry}</p>
+                      <p>
+                        Expires on: {new Date(expiry || "").toLocaleString()}
+                      </p>
+                      <p className="mt-2">Time remaining: {timeRemaining}</p>
+                      <div className="w-full mt-2">
+                        <Progress value={expiryProgress} />
+                      </div>
                       <Button onClick={copyToClipboard} className="mt-4">
                         Copy Key
                       </Button>
