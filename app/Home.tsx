@@ -9,6 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { generateRandomKey, supabase } from "../lib/utils";
 
+// Deklarasi global untuk linkvertise
+declare global {
+  interface Window {
+    linkvertise: any;
+  }
+}
+
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
   const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
@@ -68,16 +75,16 @@ const Home: React.FC = () => {
     }, 1000);
   }, []);
 
-  const updateTimeRemaining = (expiryDate: Date) => {
-    const now = new Date().getTime();
-    const timeRemaining = expiryDate.getTime() - now;
-    const seconds = Math.floor((timeRemaining / 1000) % 60);
-    const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
-    const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
-    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+const updateTimeRemaining = (expiryDate: Date) => {
+  const now = new Date().getTime();
+  const timeRemaining = expiryDate.getTime() - now;
+  const seconds = Math.floor((timeRemaining / 1000) % 60);
+  const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+  const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+  const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
-    setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
-  };
+  setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+};
 
   const generateKey = async () => {
     const newKey = generateRandomKey();
@@ -131,10 +138,32 @@ const Home: React.FC = () => {
       const script = document.createElement("script");
       script.src = "https://publisher.linkvertise.com/cdn/linkvertise.js";
       script.onload = () => resolve();
-      script.onerror = () =>
-        reject(new Error("Failed to load Linkvertise script"));
+      script.onerror = () => reject(new Error("Failed to load Linkvertise script"));
       document.body.appendChild(script);
     });
+  };
+
+  const unlockKey = () => {
+    loadLinkvertiseScript()
+      .then(() => {
+        if (typeof window.linkvertise === "function") {
+          window.linkvertise(1092296, {
+            whitelist: [""],
+            blacklist: [],
+          }).then(() => {
+            handleLinkvertiseCompletion();
+          }).catch((error: any) => {
+            console.error("Linkvertise error:", error);
+            toast.error("Linkvertise error occurred.");
+          });
+        } else {
+          throw new Error("Linkvertise is not defined");
+        }
+      })
+      .catch((error: Error) => {
+        console.error("Error loading Linkvertise script:", error);
+        toast.error(error.message);
+      });
   };
 
   return (
@@ -161,23 +190,7 @@ const Home: React.FC = () => {
             </div>
             {progress === 100 && !key && (
               <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Button
-                  onClick={() => {
-                    loadLinkvertiseScript()
-                      .then(() => {
-                        // @ts-ignore
-                        linkvertise(1092296, {
-                          whitelist: [""],
-                          blacklist: [],
-                        }).then(() => {
-                          handleLinkvertiseCompletion();
-                        });
-                      })
-                      .catch((error) => {
-                        toast.error(error.message);
-                      });
-                  }}
-                >
+                <Button onClick={unlockKey}>
                   Unlock Key
                 </Button>
               </div>
