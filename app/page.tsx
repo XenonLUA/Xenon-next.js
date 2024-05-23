@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { generateRandomKey, supabase } from "../lib/utils";
 
-// Declare global for linkvertise
 declare global {
   interface Window {
     linkvertise: any;
