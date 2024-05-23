@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { createClient } from "@supabase/supabase-js";
+import withAuth from "@/app/hoc/withAuth";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -193,4 +194,4 @@ const KeyPage: React.FC = () => {
   );
 };
 
-export default KeyPage;
+export default withAuth(KeyPage);
