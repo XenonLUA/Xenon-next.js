@@ -1,32 +1,13 @@
 "use client";
-
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
-import { createClient } from "@supabase/supabase-js";
+import { generateRandomKey, supabase } from "./page";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase environment variables");
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-const generateRandomKey = (): string => {
-  return (
-    "XENONHUB_" +
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
-};
-
-const Home: React.FC = () => {
+export const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
   const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
@@ -94,7 +75,20 @@ const Home: React.FC = () => {
     const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
     const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
-    setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+    setTimeRemaining(
+      $,
+      { days },
+      d,
+      $,
+      { hours },
+      h,
+      $,
+      { minutes },
+      m,
+      $,
+      { seconds },
+      s
+    );
   };
 
   const generateKey = async () => {
@@ -221,5 +215,3 @@ const Home: React.FC = () => {
     </section>
   );
 };
-
-export default Home;
