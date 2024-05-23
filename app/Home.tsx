@@ -26,6 +26,7 @@ const Home: React.FC = () => {
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
     const storedExpiry = localStorage.getItem("expiry");
+    const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       setKey(storedKey);
@@ -34,6 +35,9 @@ const Home: React.FC = () => {
       const expiryDate = new Date(storedExpiry);
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
+    } else if (linkvertiseCompleted === "true") {
+      localStorage.removeItem("linkvertiseCompleted");
+      generateKey();
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -100,8 +104,11 @@ const Home: React.FC = () => {
         .insert([{ key: newKey, expiry: expiryDate.toISOString() }]);
 
       if (error) {
+        console.error("Supabase error:", error);
         throw error;
       }
+
+      console.log("Supabase response data:", data);
 
       setKey(newKey);
       setExpiry(expiryDate.toISOString());
@@ -130,9 +137,7 @@ const Home: React.FC = () => {
   };
 
   const linkvertise = (link: string, userid: number) => {
-    const base_url = `https://link-to.net/${userid}/${
-      Math.random() * 1000
-    }/dynamic`;
+    const base_url = `https://link-to.net/${userid}/${Math.random() * 1000}/dynamic`;
     const href = base_url + "?r=" + btoa(encodeURI(link));
     return href;
   };
@@ -141,6 +146,7 @@ const Home: React.FC = () => {
     const link = "https://xenon-next-js-seven.vercel.app/";
     const userid = 1092296; // Replace with your Linkvertise user ID
     const linkvertiseUrl = linkvertise(link, userid);
+    localStorage.setItem("linkvertiseCompleted", "true");
     window.location.href = linkvertiseUrl;
   };
 

@@ -26,6 +26,7 @@ const Home: React.FC = () => {
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
     const storedExpiry = localStorage.getItem("expiry");
+    const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       setKey(storedKey);
@@ -34,6 +35,9 @@ const Home: React.FC = () => {
       const expiryDate = new Date(storedExpiry);
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
+    } else if (linkvertiseCompleted === "true") {
+      localStorage.removeItem("linkvertiseCompleted");
+      generateKey();
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -141,9 +145,10 @@ const Home: React.FC = () => {
   };
 
   const unlockKey = () => {
-    const link = "https://xenon-next-js-seven.vercel.app/Key";
+    const link = "https://xenon-next-js-seven.vercel.app/";
     const userid = 1092296; // Replace with your Linkvertise user ID
     const linkvertiseUrl = linkvertise(link, userid);
+    localStorage.setItem("linkvertiseCompleted", "true");
     window.location.href = linkvertiseUrl;
   };
 
