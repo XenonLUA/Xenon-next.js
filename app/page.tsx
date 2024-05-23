@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import * as React from "react";
@@ -49,7 +47,6 @@ export default function Home() {
     }, 100);
   };
 
-  // client-side code in page.tsx
   const generateKey = async () => {
     const newKey = generateRandomKey();
     const expiryDate = new Date();
@@ -78,7 +75,7 @@ export default function Home() {
         localStorage.setItem("expiry", expiryDate.toISOString());
         toast.success("Key saved successfully.");
       } else {
-        const errorData = await response.text(); // Change to text() to catch non-JSON responses
+        const errorData = await response.text();
         console.error("Server error:", errorData);
         toast.error(`Failed to save the key: ${errorData}`);
       }
