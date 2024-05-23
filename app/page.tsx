@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { createClient } from "@supabase/supabase-js";
+import { generateRandomKey } from "./utils";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || "";
@@ -17,14 +18,6 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-const generateRandomKey = (): string => {
-  return (
-    "XENONHUB_" +
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15)
-  );
-};
 
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
@@ -58,14 +51,13 @@ const Home: React.FC = () => {
           return prevProgress + 1;
         } else {
           clearInterval(interval);
-          // Generate key and show Linkvertise after progress completes
           return prevProgress;
         }
       });
     }, 100);
   };
 
-  const updateExpiryProgress = (expiryDate: Date) => {
+  const updateExpiryProgress = React.useCallback((expiryDate: Date) => {
     const totalDuration = expiryDate.getTime() - new Date().getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
@@ -84,7 +76,7 @@ const Home: React.FC = () => {
         updateTimeRemaining(expiryDate);
       }
     }, 1000);
-  };
+  }, []);
 
   const updateTimeRemaining = (expiryDate: Date) => {
     const now = new Date().getTime();
