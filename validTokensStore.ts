@@ -1,13 +1,15 @@
-let validTokens = new Set<string>();
+// /validTokensStore.ts
 
-export function addToken(token: string) {
+let validTokens: Set<string> = new Set();
+
+export const addToken = (token: string) => {
 	validTokens.add(token);
-}
+};
 
-export function isValidToken(token: string): boolean {
+export const isValidToken = (token: string) => {
 	return validTokens.has(token);
-}
+};
 
-export function removeToken(token: string) {
+export const removeToken = (token: string) => {
 	validTokens.delete(token);
-}
+};

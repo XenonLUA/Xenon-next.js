@@ -1,3 +1,4 @@
+// /app/api/verify-token/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { isValidToken, removeToken } from '@/validTokensStore';
 

@@ -178,15 +178,13 @@ const Home: React.FC = () => {
           localStorage.setItem("linkvertiseCompleted", "true");
           window.location.reload();
         } else {
-          console.error("Token verification failed:", data.message);
+          console.error("Token verification failed:", token);
           toast.error("Token verification failed.");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token.");
       }
-    } else {
-      console.error("No token found in localStorage.");
     }
   };
 
