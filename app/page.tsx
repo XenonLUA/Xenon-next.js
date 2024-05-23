@@ -1,20 +1,20 @@
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import * as React from "react";
-import { ReactTyped } from "react-typed";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ReactTyped from "react-typed";
 
-const generateRandomKey = () => {
+const generateRandomKey = (): string => {
   return (
     Math.random().toString(36).substring(2, 15) +
     Math.random().toString(36).substring(2, 15)
   );
 };
 
-export default function Home() {
-  const [progress, setProgress] = React.useState(0);
+const Home: React.FC = () => {
+  const [progress, setProgress] = React.useState<number>(0);
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
 
@@ -144,4 +144,6 @@ export default function Home() {
       <ToastContainer />
     </section>
   );
-}
+};
+
+export default Home;
