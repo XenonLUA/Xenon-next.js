@@ -1,21 +1,26 @@
-// /pages/api/verify-token.ts
-import { NextApiRequest, NextApiResponse } from 'next';
+// /app/api/verify-token/route.ts
+import { NextRequest, NextResponse } from 'next/server';
 
 // Mock token store (in-memory)
 const validTokens: Set<string> = new Set(['valid-token']);
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { token } = req.query as { token: string };
+export async function GET(req: NextRequest) {
+	const { searchParams } = new URL(req.url);
+	const token = searchParams.get('token');
+
+	if (token === null) {
+		return NextResponse.json({ success: false }, { status: 400 });
+	}
 
 	try {
 		const isValid = validTokens.has(token);
 		if (isValid) {
-			res.status(200).json({ success: true });
+			return NextResponse.json({ success: true });
 		} else {
-			res.status(400).json({ success: false });
+			return NextResponse.json({ success: false }, { status: 400 });
 		}
 	} catch (error) {
 		console.error('Error verifying token:', error);
-		res.status(500).json({ success: false, error: 'Internal Server Error' });
+		return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 });
 	}
 }
