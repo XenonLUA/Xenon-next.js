@@ -31,6 +31,7 @@ const KeyPage: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -42,6 +43,7 @@ const KeyPage: React.FC = () => {
       const expiryDate = new Date(storedExpiry);
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
+      setLoading(false);
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -105,6 +107,7 @@ const KeyPage: React.FC = () => {
       toast.success("Key saved successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
+      setLoading(false);
     } catch (error) {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
@@ -123,6 +126,16 @@ const KeyPage: React.FC = () => {
       );
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center bg-background h-[90vh]">
+        <div className="text-center">
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
