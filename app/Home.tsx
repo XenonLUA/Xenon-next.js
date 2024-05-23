@@ -176,6 +176,7 @@ const Home: React.FC = () => {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
+          await saveTokenToSupabase(token);
           window.location.reload();
         } else {
           console.error("Token verification failed:", token);
@@ -185,6 +186,24 @@ const Home: React.FC = () => {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token.");
       }
+    }
+  };
+
+  const saveTokenToSupabase = async (token: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("tokens")
+        .insert([{ token, status: "completed" }]);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
+
+      console.log("Token saved to Supabase:", data);
+    } catch (error) {
+      console.error("Error saving token to Supabase:", error);
+      toast.error("Failed to save the token to Supabase.");
     }
   };
 
