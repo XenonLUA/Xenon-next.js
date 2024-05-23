@@ -135,32 +135,23 @@ const Home: React.FC = () => {
     }
   };
 
-  const fetchTokenAndRedirect = async () => {
-    try {
-      const response = await fetch("/api/generate-token");
-      const data = await response.json();
-      localStorage.setItem("linkvertiseToken", data.token);
-      return data.token;
-    } catch (error) {
-      console.error("Error fetching token:", error);
-      toast.error("Failed to fetch token.");
-    }
-  };
-
-  const linkvertise = (link: string, userid: number, token: string) => {
-    const base_url = `https://link-to.net/${userid}/${
-      Math.random() * 1000
-    }/dynamic`;
-    const href = `${base_url}?r=${btoa(encodeURI(link))}&token=${token}`;
-    return href;
-  };
-
   const unlockKey = async () => {
     try {
       // Generate the token
       const response = await fetch("/api/generate-token");
       const data = await response.json();
       const token = data.token;
+
+      // Save the token to Supabase
+      const { data: supabaseData, error: supabaseError } = await supabase
+        .from("tokens")
+        .insert([{ token, status: "pending" }]);
+
+      if (supabaseError) {
+        console.error("Supabase insert error:", supabaseError);
+        throw supabaseError;
+      }
+
       localStorage.setItem("linkvertiseToken", token);
 
       // Redirect to Linkvertise
@@ -168,53 +159,11 @@ const Home: React.FC = () => {
       const userid = 1092296; // Replace with your Linkvertise user ID
       const linkvertiseUrl = linkvertise(link, userid, token);
       window.location.href = linkvertiseUrl;
-
-      // Verify the token immediately
-      const verificationResponse = await fetch(
-        `/api/verify-token?token=${token}`
-      );
-      const verificationData = await verificationResponse.json();
-
-      if (verificationData.success) {
-        console.log("Token verified successfully:", token);
-        localStorage.removeItem("linkvertiseToken");
-        localStorage.setItem("linkvertiseCompleted", "true");
-        await saveTokenToSupabase(token);
-        window.location.reload();
-      } else {
-        console.error("Token verification failed:", token);
-        toast.error(
-          "Token verification failed. Please complete the Linkvertise process."
-        );
-        localStorage.removeItem("linkvertiseToken");
-      }
     } catch (error) {
       console.error("Error during unlocking key:", error);
       toast.error("Failed to unlock key. Please try again.");
     }
   };
-
-  const saveTokenToSupabase = async (token: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("tokens")
-        .insert([{ token, status: "completed" }]);
-
-      if (error) {
-        console.error("Supabase insert error:", error);
-        throw error;
-      }
-
-      console.log("Token saved to Supabase:", data);
-    } catch (error) {
-      console.error("Error saving token to Supabase:", error);
-      toast.error("Failed to save the token on the server.");
-    }
-  };
-
-  React.useEffect(() => {
-    verifyToken();
-  }, []);
 
   const verifyToken = async () => {
     const token = localStorage.getItem("linkvertiseToken");
@@ -226,8 +175,8 @@ const Home: React.FC = () => {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
-          await saveTokenToSupabase(token);
-          window.location.reload();
+          await updateTokenStatusInSupabase(token, "completed");
+          generateKey();
         } else {
           console.error("Token verification failed:", token);
           toast.error(
@@ -240,6 +189,37 @@ const Home: React.FC = () => {
         toast.error("Failed to verify token. Please try again.");
       }
     }
+  };
+
+  const updateTokenStatusInSupabase = async (token: string, status: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("tokens")
+        .update({ status })
+        .eq("token", token);
+
+      if (error) {
+        console.error("Supabase update error:", error);
+        throw error;
+      }
+
+      console.log("Token status updated in Supabase:", data);
+    } catch (error) {
+      console.error("Error updating token status in Supabase:", error);
+      toast.error("Failed to update the token status on the server");
+    }
+  };
+
+  React.useEffect(() => {
+    verifyToken();
+  }, []);
+
+  const linkvertise = (link: string, userid: number, token: string) => {
+    const base_url = `https://link-to.net/${userid}/${
+      Math.random() * 1000
+    }/dynamic`;
+    const href = `${base_url}?r=${btoa(encodeURI(link))}&token=${token}`;
+    return href;
   };
 
   return (
@@ -271,38 +251,42 @@ const Home: React.FC = () => {
         <div className="w-full max-w-lg mx-auto mt-10">
           {progress < 100 ? (
             <div className="flex flex-col items-center justify-center">
-              <p className="mb-2 text-gray-200">
-                Please wait while we prepare your key...
+              <p className="mb-4 text-lg font-medium text-gray-300">
+                Preparing your key, please wait...
               </p>
               <Progress value={progress} className="w-full" />
             </div>
-          ) : key ? (
-            <Card className="w-full max-w-lg mx-auto mt-10">
+          ) : key && expiry ? (
+            <Card>
               <CardHeader>
-                <CardTitle>Your Key</CardTitle>
+                <CardTitle>Here is your key!</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="mb-2 text-gray-500">{key}</p>
-                <Button onClick={copyToClipboard}>Copy Key</Button>
-                <p className="mt-4 text-sm text-gray-500">
-                  Time remaining: {timeRemaining}
+                <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
+                  {key}
+                </div>
+                <Button
+                  onClick={copyToClipboard}
+                  className="w-full mb-2 bg-blue-500 hover:bg-blue-700"
+                >
+                  Copy Key
+                </Button>
+                <p className="text-sm text-gray-500">
+                  Key expires in: {timeRemaining}
                 </p>
-                <Progress value={expiryProgress} className="w-full mt-2" />
               </CardContent>
             </Card>
           ) : (
-            <Card className="w-full max-w-lg mx-auto mt-10">
-              <CardHeader>
-                <CardTitle>Unlock Key</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={unlockKey}>Unlock Key</Button>
-              </CardContent>
-            </Card>
+            <Button
+              onClick={unlockKey}
+              className="w-full bg-blue-500 hover:bg-blue-700"
+            >
+              Unlock Key
+            </Button>
           )}
         </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </section>
   );
 };
