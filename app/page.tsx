@@ -78,9 +78,9 @@ export default function Home() {
         localStorage.setItem("expiry", expiryDate.toISOString());
         toast.success("Key saved successfully.");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.text(); // Change to text() to catch non-JSON responses
         console.error("Server error:", errorData);
-        toast.error(`Failed to save the key: ${errorData.message}`);
+        toast.error(`Failed to save the key: ${errorData}`);
       }
     } catch (error) {
       console.error("Fetch error:", error);
