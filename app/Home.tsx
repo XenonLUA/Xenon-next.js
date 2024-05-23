@@ -129,44 +129,19 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleLinkvertiseCompletion = () => {
-    generateKey();
-  };
-
-  const loadLinkvertiseScript = () => {
-    return new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://publisher.linkvertise.com/cdn/linkvertise.js";
-      script.onload = () => resolve();
-      script.onerror = () =>
-        reject(new Error("Failed to load Linkvertise script"));
-      document.body.appendChild(script);
-    });
-  };
-
   const linkvertise = (link: string, userid: number) => {
-    const base_url = `https://linkvertise.com/${userid}/dynamic`;
-    const encodedLink = encodeURIComponent(link);
-    const href = `${base_url}?r=${encodedLink}`;
+    const base_url = `https://link-to.net/${userid}/${
+      Math.random() * 1000
+    }/dynamic`;
+    const href = base_url + "?r=" + btoa(encodeURI(link));
     return href;
   };
 
   const unlockKey = () => {
-    loadLinkvertiseScript()
-      .then(() => {
-        if (typeof window.linkvertise === "function") {
-          const link = "https://xenon-next-js-seven.vercel.app/key";
-          const userid = 1092296; // Replace with your Linkvertise user ID
-          const linkvertiseUrl = linkvertise(link, userid);
-          window.location.href = linkvertiseUrl;
-        } else {
-          throw new Error("Linkvertise is not defined");
-        }
-      })
-      .catch((error: Error) => {
-        console.error("Error loading Linkvertise script:", error);
-        toast.error(error.message);
-      });
+    const link = "https://xenon-next-js-seven.vercel.app/";
+    const userid = 1092296; // Replace with your Linkvertise user ID
+    const linkvertiseUrl = linkvertise(link, userid);
+    window.location.href = linkvertiseUrl;
   };
 
   return (
