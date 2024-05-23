@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
-import { generateRandomKey, supabase } from "./page";
+import { generateRandomKey, supabase } from "../lib/utils";
 
 export const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
@@ -75,20 +75,7 @@ export const Home: React.FC = () => {
     const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
     const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
-    setTimeRemaining(
-      $,
-      { days },
-      d,
-      $,
-      { hours },
-      h,
-      $,
-      { minutes },
-      m,
-      $,
-      { seconds },
-      s
-    );
+    setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
   };
 
   const generateKey = async () => {
