@@ -1,14 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import crypto from 'crypto';
-
-interface Tokens {
-	[key: string]: boolean;
-}
-
-let tokens: Tokens = {}; // In-memory token store (use a database in production)
+import { NextApiRequest, NextApiResponse } from "next";
+import { v4 as uuidv4 } from "uuid";
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-	const token = crypto.randomBytes(16).toString('hex');
-	tokens[token] = true; // Save the token
+	const token = uuidv4();
 	res.status(200).json({ token });
 }
