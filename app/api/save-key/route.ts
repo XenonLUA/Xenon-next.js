@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { clientPromise } from '@/lib/mongodb';
+import { MongoClient } from 'mongodb';
 
 export async function POST(req: NextRequest) {
 	try {
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ message: 'Expiry must be a valid date' }, { status: 400 });
 		}
 
-		const client = await clientPromise;
+		const client: MongoClient = await clientPromise;
 		const db = client.db(process.env.MONGODB_DB);
 		const collection = db.collection('validKeys');
 

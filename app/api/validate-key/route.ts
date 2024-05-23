@@ -21,8 +21,6 @@ export async function POST(req: NextRequest) {
 			return NextResponse.json({ valid: false }, { status: 200 });
 		}
 	} catch (error) {
-		console.error('Error validating key:', error);
-
 		if (error instanceof SyntaxError) {
 			return NextResponse.json({ message: 'Invalid JSON format' }, { status: 400 });
 		}
