@@ -180,11 +180,14 @@ const Home: React.FC = () => {
           window.location.reload();
         } else {
           console.error("Token verification failed:", token);
-          toast.error("Token verification failed.");
+          toast.error(
+            "Token verification failed. Please complete the Linkvertise process."
+          );
+          localStorage.removeItem("linkvertiseToken");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
-        toast.error("Failed to verify token.");
+        toast.error("Failed to verify token. Please try again.");
       }
     }
   };
@@ -203,7 +206,7 @@ const Home: React.FC = () => {
       console.log("Token saved to Supabase:", data);
     } catch (error) {
       console.error("Error saving token to Supabase:", error);
-      toast.error("Failed to save the token to Supabase.");
+      toast.error("Failed to save the token on the server.");
     }
   };
 
