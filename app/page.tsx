@@ -139,6 +139,7 @@ const Home: React.FC = () => {
     try {
       const response = await fetch("/api/generate-token");
       const data = await response.json();
+      localStorage.setItem("linkvertiseToken", data.token);
       return data.token;
     } catch (error) {
       console.error("Error fetching token:", error);
