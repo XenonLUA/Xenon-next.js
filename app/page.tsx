@@ -1,10 +1,12 @@
+"use client";
+
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactTyped from "react-typed";
+import { ReactTyped } from "react-typed";
 
 const generateRandomKey = (): string => {
   return (
