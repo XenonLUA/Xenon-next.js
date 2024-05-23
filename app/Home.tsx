@@ -75,16 +75,16 @@ const Home: React.FC = () => {
     }, 1000);
   }, []);
 
-const updateTimeRemaining = (expiryDate: Date) => {
-  const now = new Date().getTime();
-  const timeRemaining = expiryDate.getTime() - now;
-  const seconds = Math.floor((timeRemaining / 1000) % 60);
-  const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
-  const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
-  const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+  const updateTimeRemaining = (expiryDate: Date) => {
+    const now = new Date().getTime();
+    const timeRemaining = expiryDate.getTime() - now;
+    const seconds = Math.floor((timeRemaining / 1000) % 60);
+    const minutes = Math.floor((timeRemaining / (1000 * 60)) % 60);
+    const hours = Math.floor((timeRemaining / (1000 * 60 * 60)) % 24);
+    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
-  setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
-};
+    setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+  };
 
   const generateKey = async () => {
     const newKey = generateRandomKey();
@@ -138,7 +138,8 @@ const updateTimeRemaining = (expiryDate: Date) => {
       const script = document.createElement("script");
       script.src = "https://publisher.linkvertise.com/cdn/linkvertise.js";
       script.onload = () => resolve();
-      script.onerror = () => reject(new Error("Failed to load Linkvertise script"));
+      script.onerror = () =>
+        reject(new Error("Failed to load Linkvertise script"));
       document.body.appendChild(script);
     });
   };
@@ -147,15 +148,18 @@ const updateTimeRemaining = (expiryDate: Date) => {
     loadLinkvertiseScript()
       .then(() => {
         if (typeof window.linkvertise === "function") {
-          window.linkvertise(1092296, {
-            whitelist: [""],
-            blacklist: [],
-          }).then(() => {
-            handleLinkvertiseCompletion();
-          }).catch((error: any) => {
-            console.error("Linkvertise error:", error);
-            toast.error("Linkvertise error occurred.");
-          });
+          window
+            .linkvertise(1092296, {
+              whitelist: ["https://xenon-next-js-seven.vercel.app/"],
+              blacklist: [],
+            })
+            .then(() => {
+              handleLinkvertiseCompletion();
+            })
+            .catch((error: any) => {
+              console.error("Linkvertise error:", error);
+              toast.error("Linkvertise error occurred.");
+            });
         } else {
           throw new Error("Linkvertise is not defined");
         }
@@ -190,9 +194,7 @@ const updateTimeRemaining = (expiryDate: Date) => {
             </div>
             {progress === 100 && !key && (
               <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Button onClick={unlockKey}>
-                  Unlock Key
-                </Button>
+                <Button onClick={unlockKey}>Unlock Key</Button>
               </div>
             )}
             {progress === 100 && key && (

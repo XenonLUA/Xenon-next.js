@@ -150,7 +150,7 @@ const Home: React.FC = () => {
         if (typeof window.linkvertise === "function") {
           window
             .linkvertise(1092296, {
-              whitelist: [""],
+              whitelist: ["https://xenon-next-js-seven.vercel.app/"],
               blacklist: [],
             })
             .then(() => {
