@@ -206,7 +206,7 @@ const Home: React.FC = () => {
       console.log("Token saved to Supabase:", data);
     } catch (error) {
       console.error("Error saving token to Supabase:", error);
-      toast.error("Failed to save the token on the server.");
+      toast.error("Failed to save the token on the server");
     }
   };
 
