@@ -156,15 +156,65 @@ const Home: React.FC = () => {
   };
 
   const unlockKey = async () => {
-    const token = await fetchTokenAndRedirect();
-    if (token) {
+    try {
+      // Generate the token
+      const response = await fetch("/api/generate-token");
+      const data = await response.json();
+      const token = data.token;
+      localStorage.setItem("linkvertiseToken", token);
+
+      // Redirect to Linkvertise
       const link = "https://xenon-next-js-seven.vercel.app/";
       const userid = 1092296; // Replace with your Linkvertise user ID
       const linkvertiseUrl = linkvertise(link, userid, token);
-      localStorage.setItem("linkvertiseToken", token);
       window.location.href = linkvertiseUrl;
+
+      // Verify the token immediately
+      const verificationResponse = await fetch(
+        `/api/verify-token?token=${token}`
+      );
+      const verificationData = await verificationResponse.json();
+
+      if (verificationData.success) {
+        console.log("Token verified successfully:", token);
+        localStorage.removeItem("linkvertiseToken");
+        localStorage.setItem("linkvertiseCompleted", "true");
+        await saveTokenToSupabase(token);
+        window.location.reload();
+      } else {
+        console.error("Token verification failed:", token);
+        toast.error(
+          "Token verification failed. Please complete the Linkvertise process."
+        );
+        localStorage.removeItem("linkvertiseToken");
+      }
+    } catch (error) {
+      console.error("Error during unlocking key:", error);
+      toast.error("Failed to unlock key. Please try again.");
     }
   };
+
+  const saveTokenToSupabase = async (token: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("tokens")
+        .insert([{ token, status: "completed" }]);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
+      }
+
+      console.log("Token saved to Supabase:", data);
+    } catch (error) {
+      console.error("Error saving token to Supabase:", error);
+      toast.error("Failed to save the token on the server.");
+    }
+  };
+
+  React.useEffect(() => {
+    verifyToken();
+  }, []);
 
   const verifyToken = async () => {
     const token = localStorage.getItem("linkvertiseToken");
@@ -192,28 +242,6 @@ const Home: React.FC = () => {
     }
   };
 
-  const saveTokenToSupabase = async (token: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("tokens")
-        .insert([{ token, status: "completed" }]);
-
-      if (error) {
-        console.error("Supabase insert error:", error);
-        throw error;
-      }
-
-      console.log("Token saved to Supabase:", data);
-    } catch (error) {
-      console.error("Error saving token to Supabase:", error);
-      toast.error("Failed to save the token on the server");
-    }
-  };
-
-  React.useEffect(() => {
-    verifyToken();
-  }, []);
-
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
@@ -231,41 +259,47 @@ const Home: React.FC = () => {
             </span>
 
             <div>
-              <h1 className="mt-8 text-3xl font-extrabold tracking-tight lg:text-6xl"></h1>
-              <div className="max-w-xl mx-auto mt-8 text-base lg:text-xl text-secondary-foreground">
-                <Progress value={progress} />
-              </div>
+              <h1 className="max-w-3xl mx-auto mt-5 text-5xl font-bold tracking-normal text-white md:text-7xl">
+                XENON HUB SCRIPT
+              </h1>
+              <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
+                Xenon Hub is a powerful tool for your needs.
+              </p>
             </div>
-            {progress === 100 && !key && (
-              <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Button onClick={unlockKey}>Unlock Key</Button>
-              </div>
-            )}
-            {progress === 100 && key && (
-              <div className="flex justify-center max-w-sm mx-auto mt-10">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>YOUR KEY</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col items-center">
-                      <p>{key}</p>
-                      <p>
-                        Expires on: {new Date(expiry || "").toLocaleString()}
-                      </p>
-                      <p className="mt-2">Time remaining: {timeRemaining}</p>
-                      <div className="w-full mt-2">
-                        <Progress value={expiryProgress} />
-                      </div>
-                      <Button onClick={copyToClipboard} className="mt-4">
-                        Copy Key
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
           </div>
+        </div>
+        <div className="w-full max-w-lg mx-auto mt-10">
+          {progress < 100 ? (
+            <div className="flex flex-col items-center justify-center">
+              <p className="mb-2 text-gray-200">
+                Please wait while we prepare your key...
+              </p>
+              <Progress value={progress} className="w-full" />
+            </div>
+          ) : key ? (
+            <Card className="w-full max-w-lg mx-auto mt-10">
+              <CardHeader>
+                <CardTitle>Your Key</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="mb-2 text-gray-500">{key}</p>
+                <Button onClick={copyToClipboard}>Copy Key</Button>
+                <p className="mt-4 text-sm text-gray-500">
+                  Time remaining: {timeRemaining}
+                </p>
+                <Progress value={expiryProgress} className="w-full mt-2" />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="w-full max-w-lg mx-auto mt-10">
+              <CardHeader>
+                <CardTitle>Unlock Key</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button onClick={unlockKey}>Unlock Key</Button>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
       <ToastContainer />

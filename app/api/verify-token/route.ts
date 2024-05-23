@@ -1,4 +1,3 @@
-// /app/api/verify-token/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient"; // Adjust the import path as needed
 
@@ -17,9 +16,7 @@ export async function GET(req: NextRequest) {
 
 		if (verificationData.success) {
 			// Token is valid, insert into Supabase
-			const { data, error } = await supabase
-				.from("tokens")
-				.insert([{ token, status: "used" }]);
+			const { data, error } = await supabase.from("tokens").insert([{ token, status: "used" }]);
 
 			if (error) {
 				console.error("Supabase insert error:", error);
