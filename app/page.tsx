@@ -136,21 +136,59 @@ const Home: React.FC = () => {
     }
   };
 
-  const linkvertise = (link: string, userid: number) => {
+  const fetchTokenAndRedirect = async () => {
+    try {
+      const response = await fetch("/generate-token");
+      const data = await response.json();
+      return data.token;
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      toast.error("Failed to fetch token.");
+    }
+  };
+
+  const linkvertise = (link: string, userid: number, token: string) => {
     const base_url = `https://link-to.net/${userid}/${
       Math.random() * 1000
     }/dynamic`;
-    const href = base_url + "?r=" + btoa(encodeURI(link));
+    const href = `${base_url}?r=${btoa(encodeURI(link))}&token=${token}`;
     return href;
   };
 
-  const unlockKey = () => {
-    const link = "https://xenon-next-js-seven.vercel.app/";
-    const userid = 1092296; // Replace with your Linkvertise user ID
-    const linkvertiseUrl = linkvertise(link, userid);
-    localStorage.setItem("linkvertiseCompleted", "true");
-    window.location.href = linkvertiseUrl;
+  const unlockKey = async () => {
+    const token = await fetchTokenAndRedirect();
+    if (token) {
+      const link = "https://xenon-next-js-seven.vercel.app/";
+      const userid = 1092296; // Replace with your Linkvertise user ID
+      const linkvertiseUrl = linkvertise(link, userid, token);
+      localStorage.setItem("linkvertiseToken", token);
+      window.location.href = linkvertiseUrl;
+    }
   };
+
+  const verifyToken = async () => {
+    const token = localStorage.getItem("linkvertiseToken");
+    if (token) {
+      try {
+        const response = await fetch(`/verify-token?token=${token}`);
+        const data = await response.json();
+        if (data.success) {
+          localStorage.removeItem("linkvertiseToken");
+          localStorage.setItem("linkvertiseCompleted", "true");
+          window.location.reload();
+        } else {
+          toast.error("Token verification failed.");
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        toast.error("Failed to verify token.");
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    verifyToken();
+  }, []);
 
   return (
     <section className="flex items-center justify-center bg-background h-[90vh]">
