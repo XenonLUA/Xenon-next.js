@@ -1,9 +1,10 @@
-import { NextApiRequest, NextApiResponse } from "next";
+// /pages/api/verify-token.ts
+import { NextApiRequest, NextApiResponse } from 'next';
 
 // Mock token store (in-memory)
 const validTokens: Set<string> = new Set(['valid-token']);
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { token } = req.query as { token: string };
 
 	try {
