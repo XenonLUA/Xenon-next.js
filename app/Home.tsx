@@ -1,13 +1,15 @@
 "use client";
+
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReactTyped } from "react-typed";
 import { generateRandomKey, supabase } from "../lib/utils";
 
-export const Home: React.FC = () => {
+const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
   const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
@@ -39,14 +41,13 @@ export const Home: React.FC = () => {
           return prevProgress + 1;
         } else {
           clearInterval(interval);
-          // Generate key and show Linkvertise after progress completes
           return prevProgress;
         }
       });
     }, 100);
   };
 
-  const updateExpiryProgress = (expiryDate: Date) => {
+  const updateExpiryProgress = React.useCallback((expiryDate: Date) => {
     const totalDuration = expiryDate.getTime() - new Date().getTime();
     const interval = setInterval(() => {
       const now = new Date().getTime();
@@ -65,7 +66,7 @@ export const Home: React.FC = () => {
         updateTimeRemaining(expiryDate);
       }
     }, 1000);
-  };
+  }, []);
 
   const updateTimeRemaining = (expiryDate: Date) => {
     const now = new Date().getTime();
@@ -202,3 +203,5 @@ export const Home: React.FC = () => {
     </section>
   );
 };
+
+export default Home;
