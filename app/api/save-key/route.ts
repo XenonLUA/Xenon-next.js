@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize the Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+type SaveKeyRequest = {
+	key: string;
+	expiry: string;
+};
 
 export async function POST(req: NextRequest) {
 	try {
-		const { key, expiry } = await req.json();
+		const { key, expiry }: SaveKeyRequest = await req.json();
 		console.log("Received request with key:", key, "and expiry:", expiry);
 
 		if (typeof key !== 'string' || typeof expiry !== 'string') {
