@@ -243,7 +243,7 @@ const Home: React.FC = () => {
                 XENON HUB KEY
               </h1>
               <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
-                Xenon Hub is a powerful tool for your needs.
+                This key for XENON HUB.
               </p>
             </div>
           </div>
@@ -258,10 +258,10 @@ const Home: React.FC = () => {
             </div>
           ) : key && expiry ? (
             <Card>
-              <CardHeader>
+              <CardHeader className="text-center">
                 <CardTitle>Here is your key!</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="text-center">
                 <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
                   {key}
                 </div>
@@ -271,7 +271,7 @@ const Home: React.FC = () => {
                 >
                   Copy Key
                 </Button>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 text-center">
                   Key expires in: {timeRemaining}
                 </p>
               </CardContent>
