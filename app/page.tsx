@@ -285,6 +285,43 @@ const Home: React.FC = () => {
             </Button>
           )}
         </div>
+
+        {/* New Cards Section */}
+        <div className="w-full max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Script 1</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
+                COPY SCRIPT
+              </div>
+              <Button className="w-full bg-blue-500 hover:bg-blue-700">
+                COPY SCRIPT
+              </Button>
+            </CardContent>
+          </Card>
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 2</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 2 goes here.</p>
+            </CardContent>
+            <Button className="w-full bg-blue-500 hover:bg-blue-700">
+              COPY SCRIPT
+            </Button>
+          </Card>
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 3</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 3 goes here.</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <ToastContainer />
       </div>
     </section>

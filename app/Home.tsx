@@ -285,6 +285,35 @@ const Home: React.FC = () => {
             </Button>
           )}
         </div>
+
+        {/* New Cards Section */}
+        <div className="w-full max-w-lg mx-auto mt-10 grid grid-cols-1 gap-4">
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 1</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 1 goes here.</p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 2</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 2 goes here.</p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 3</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 3 goes here.</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <ToastContainer />
       </div>
     </section>
