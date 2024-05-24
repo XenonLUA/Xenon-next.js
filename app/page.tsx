@@ -272,9 +272,6 @@ const Home: React.FC = () => {
           <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-bold">
             WELCOME TO XENON HUB
           </h1>
-          <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-            Get Your Key to Access
-          </p>
           {progress < 100 ? (
             <div>
               <Progress value={progress} className="w-full h-4 mb-4" />
@@ -309,6 +306,9 @@ const Home: React.FC = () => {
             </div>
           ) : (
             <div className="text-center">
+              <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+                Get Your Key to Access
+              </h1>
               <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
                 Click the button below to unlock your key.
               </p>
