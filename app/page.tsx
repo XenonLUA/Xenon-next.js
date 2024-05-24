@@ -243,7 +243,7 @@ const Home: React.FC = () => {
                 XENON HUB KEY
               </h1>
               <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
-                This key for XENON HUB.
+                Use all Script Xenon HUB.
               </p>
             </div>
           </div>
