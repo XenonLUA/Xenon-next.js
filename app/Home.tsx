@@ -23,25 +23,38 @@ const Home: React.FC = () => {
   const [expiry, setExpiry] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const storedKey = localStorage.getItem("key");
-    const storedExpiry = localStorage.getItem("expiry");
-    const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
+    const checkForKey = async () => {
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .select("*")
+        .order("expiry", { ascending: false })
+        .limit(1);
 
-    if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
-      setKey(storedKey);
-      setExpiry(storedExpiry);
-      setProgress(100);
-      const expiryDate = new Date(storedExpiry);
-      updateExpiryProgress(expiryDate);
-      updateTimeRemaining(expiryDate);
-    } else if (linkvertiseCompleted === "true") {
-      localStorage.removeItem("linkvertiseCompleted");
-      generateKey();
-    } else {
-      localStorage.removeItem("key");
-      localStorage.removeItem("expiry");
-      startProgress();
-    }
+      if (error) {
+        console.error("Supabase error:", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const existingKey = data[0];
+        const expiryDate = new Date(existingKey.expiry);
+
+        if (expiryDate > new Date()) {
+          setKey(existingKey.key);
+          setExpiry(existingKey.expiry);
+          setProgress(100);
+          updateExpiryProgress(expiryDate);
+          updateTimeRemaining(expiryDate);
+        } else {
+          await deleteExpiredKey(existingKey.key);
+          generateKey();
+        }
+      } else {
+        generateKey();
+      }
+    };
+
+    checkForKey();
   }, []);
 
   const startProgress = () => {
@@ -69,8 +82,6 @@ const Home: React.FC = () => {
         clearInterval(interval);
         setKey(null);
         setExpiry(null);
-        localStorage.removeItem("key");
-        localStorage.removeItem("expiry");
         toast.error("Key has expired.");
       } else {
         updateTimeRemaining(expiryDate);
@@ -94,9 +105,6 @@ const Home: React.FC = () => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
 
-    console.log("Generating new key:", newKey);
-    console.log("Expiry date:", expiryDate.toISOString());
-
     try {
       const { data, error } = await supabase
         .from("valid_keys")
@@ -107,12 +115,8 @@ const Home: React.FC = () => {
         throw error;
       }
 
-      console.log("Supabase response data:", data);
-
       setKey(newKey);
       setExpiry(expiryDate.toISOString());
-      localStorage.setItem("key", newKey);
-      localStorage.setItem("expiry", expiryDate.toISOString());
       toast.success("Key saved successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
@@ -137,12 +141,10 @@ const Home: React.FC = () => {
 
   const unlockKey = async () => {
     try {
-      // Generate the token
       const response = await fetch("/api/generate-token");
       const data = await response.json();
       const token = data.token;
 
-      // Save the token to Supabase
       const { data: supabaseData, error: supabaseError } = await supabase
         .from("tokens")
         .insert([{ token, status: "pending" }]);
@@ -154,9 +156,8 @@ const Home: React.FC = () => {
 
       localStorage.setItem("linkvertiseToken", token);
 
-      // Redirect to Linkvertise
       const link = "https://xenon-next-js-seven.vercel.app/";
-      const userid = 1092296; // Replace with your Linkvertise user ID
+      const userid = 1092296;
       const linkvertiseUrl = linkvertise(link, userid, token);
       window.location.href = linkvertiseUrl;
     } catch (error) {
@@ -172,20 +173,17 @@ const Home: React.FC = () => {
         const response = await fetch(`/api/verify-token?token=${token}`);
         const data = await response.json();
         if (data.success) {
-          console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
           await updateTokenStatusInSupabase(token, "completed");
           generateKey();
         } else {
-          console.error("Token verification failed:", token);
           toast.error(
             "Token verification failed. Please complete the Linkvertise process."
           );
           localStorage.removeItem("linkvertiseToken");
         }
       } catch (error) {
-        console.error("Error verifying token:", error);
         toast.error("Failed to verify token. Please try again.");
       }
     }
@@ -199,14 +197,25 @@ const Home: React.FC = () => {
         .eq("token", token);
 
       if (error) {
-        console.error("Supabase update error:", error);
         throw error;
       }
-
-      console.log("Token status updated in Supabase:", data);
     } catch (error) {
-      console.error("Error updating token status in Supabase:", error);
       toast.error("Failed to update the token status on the server");
+    }
+  };
+
+  const deleteExpiredKey = async (key: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .delete()
+        .eq("key", key);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error("Error deleting expired key:", error);
     }
   };
 
@@ -240,7 +249,7 @@ const Home: React.FC = () => {
 
             <div>
               <h1 className="max-w-3xl mx-auto mt-5 text-5xl font-bold tracking-normal text-white md:text-7xl">
-                XENON HUB SCRIPT
+                XENON HUB KEY
               </h1>
               <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
                 Xenon Hub is a powerful tool for your needs.
@@ -267,7 +276,7 @@ const Home: React.FC = () => {
                 </div>
                 <Button
                   onClick={copyToClipboard}
-                  className="w-full mb-2 bg-blue-500 hover:bg-blue-700"
+                  className="w-full mb-2 bg-orange-500 hover:bg-orange-700"
                 >
                   Copy Key
                 </Button>
@@ -279,7 +288,7 @@ const Home: React.FC = () => {
           ) : (
             <Button
               onClick={unlockKey}
-              className="w-full bg-blue-500 hover:bg-blue-700"
+              className="w-full bg-orange-500 hover:bg-orange-700"
             >
               Unlock Key
             </Button>
