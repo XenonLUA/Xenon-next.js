@@ -71,7 +71,10 @@ const Home: React.FC = () => {
     const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
-      validateKey(storedKey);
+      setKey(storedKey);
+      setExpiry(storedExpiry);
+      setProgress(100);
+      fetchExpiryFromSupabase(storedKey);
     } else if (linkvertiseCompleted === "true") {
       localStorage.removeItem("linkvertiseCompleted");
       generateKey();
@@ -81,35 +84,6 @@ const Home: React.FC = () => {
       startProgress();
     }
   }, []);
-
-  const validateKey = async (key: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("valid_keys")
-        .select("expiry")
-        .eq("key", key)
-        .single();
-
-      if (error || !data) {
-        // If the key is invalid, prompt the user to unlock a new one
-        toast.error("Stored key is no longer valid. Please unlock a new key.");
-        localStorage.removeItem("key");
-        localStorage.removeItem("expiry");
-        startProgress();
-      } else {
-        // If the key is valid, update the state and continue
-        const expiryDate = new Date(data.expiry);
-        setKey(key);
-        setExpiry(data.expiry);
-        setProgress(100);
-        updateExpiryProgress(expiryDate);
-        updateTimeRemaining(expiryDate);
-      }
-    } catch (error) {
-      console.error("Error validating key from Supabase:", error);
-      toast.error("Failed to validate key from the server.");
-    }
-  };
 
   const startProgress = () => {
     const interval = setInterval(() => {
@@ -344,7 +318,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expires: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
