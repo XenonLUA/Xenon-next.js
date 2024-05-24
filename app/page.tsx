@@ -269,22 +269,22 @@ const Home: React.FC = () => {
     <section className="flex items-center justify-center min-h-screen py-20">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
         <div className="max-w-2xl p-6 mx-auto rounded-lg shadow">
-          <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+          <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-bold">
             WELCOME TO XENON HUB
           </h1>
-          <p className="mb-4 text-lg font-semibold text-center text-gray-700">
+          <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
             Get Your Key to Access
           </p>
           {progress < 100 ? (
             <div>
               <Progress value={progress} className="w-full h-4 mb-4" />
-              <p className="text-lg font-semibold text-center text-gray-700">
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
                 Loading... {progress}%
               </p>
             </div>
           ) : key ? (
             <div className="text-center">
-              <p className="mb-2 text-lg font-semibold text-gray-700">
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-medium">
                 Your Key:
               </p>
               <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
@@ -297,21 +297,19 @@ const Home: React.FC = () => {
                 Copy Key
               </Button>
               {expiry && (
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
                   Key expiry: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
                 <div className="mt-4">
-                  <p className="text-sm text-gray-600">
-                    Time remaining: {timeRemaining}
-                  </p>
+                  <p className="text-center">Time remaining: {timeRemaining}</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="text-center">
-              <p className="mb-4 text-lg font-semibold text-gray-700">
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
                 Click the button below to unlock your key.
               </p>
               <Button
