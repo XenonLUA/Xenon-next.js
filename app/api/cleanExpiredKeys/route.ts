@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export async function GET() {
 	try {
 		const { data, error } = await supabase
 			.from('valid_keys')
@@ -13,9 +13,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		console.log('Deleted expired keys:', data);
-		res.status(200).json({ message: 'Expired keys cleaned up successfully' });
+		return NextResponse.json({ message: 'Expired keys cleaned up successfully' });
 	} catch (error) {
 		console.error('Error deleting expired keys:', error);
-		res.status(500).json({ message: 'Internal server error' });
+		return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
 	}
 }
