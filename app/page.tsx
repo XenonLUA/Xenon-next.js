@@ -268,8 +268,8 @@ const Home: React.FC = () => {
   return (
     <section className="flex items-center justify-center min-h-screen py-20">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
-        <div className="max-w-2xl p-6 mx-auto bg-black rounded-lg shadow">
-          <h1 className="mb-6 text-2xl font-bold text-center">
+        <div className="max-w-2xl p-6 mx-auto rounded-lg shadow">
+          <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
             WELCOME TO XENON HUB
           </h1>
           <p className="mb-4 text-lg font-semibold text-center text-gray-700">
@@ -303,10 +303,6 @@ const Home: React.FC = () => {
               )}
               {expiryProgress > 0 && (
                 <div className="mt-4">
-                  <Progress
-                    value={expiryProgress}
-                    className="w-full h-4 mb-2"
-                  />
                   <p className="text-sm text-gray-600">
                     Time remaining: {timeRemaining}
                   </p>
