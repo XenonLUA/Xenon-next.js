@@ -74,9 +74,7 @@ const Home: React.FC = () => {
       setKey(storedKey);
       setExpiry(storedExpiry);
       setProgress(100);
-      const expiryDate = new Date(storedExpiry);
-      updateExpiryProgress(expiryDate);
-      updateTimeRemaining(expiryDate);
+      fetchExpiryFromSupabase(storedKey);
     } else if (linkvertiseCompleted === "true") {
       localStorage.removeItem("linkvertiseCompleted");
       generateKey();
@@ -130,6 +128,31 @@ const Home: React.FC = () => {
     const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
     setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+  };
+
+  const fetchExpiryFromSupabase = async (key: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .select("expiry")
+        .eq("key", key)
+        .single();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      if (data) {
+        const expiryDate = new Date(data.expiry);
+        setExpiry(data.expiry);
+        updateExpiryProgress(expiryDate);
+        updateTimeRemaining(expiryDate);
+      }
+    } catch (error) {
+      console.error("Error fetching expiry from Supabase:", error);
+      toast.error("Failed to fetch expiry from the server.");
+    }
   };
 
   const generateKey = async () => {
@@ -295,7 +318,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expiry: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
