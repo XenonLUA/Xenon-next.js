@@ -223,7 +223,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <section className="flex items-center justify-center bg-background h-[90vh]">
+    <section className="flex items-center justify-center bg-background min-h-screen">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
         <div className="max-w-3xl mx-auto text-center">
           <div>
@@ -239,7 +239,7 @@ const Home: React.FC = () => {
             </span>
 
             <div>
-              <h1 className="max-w-3xl mx-auto mt-5 text-5xl font-bold tracking-normal text-white md:text-7xl">
+              <h1 className="max-w-3xl mx-auto mt-5 text-5xl font-bold tracking-normal text-white">
                 XENON HUB KEY
               </h1>
               <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
@@ -247,10 +247,9 @@ const Home: React.FC = () => {
               </p>
             </div>
           </div>
-        </div>
-        <div className="w-full max-w-lg mx-auto mt-10">
+
           {progress < 100 ? (
-            <div className="flex flex-col items-center justify-center">
+            <div className="mt-10">
               <p className="mb-4 text-lg font-medium text-gray-300">
                 Preparing your key, please wait...
               </p>
@@ -287,13 +286,18 @@ const Home: React.FC = () => {
         </div>
 
         {/* New Cards Section */}
-        <div className="w-full max-w-lg mx-auto mt-10 grid grid-cols-1 gap-4">
+        <div className="w-full max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card className="rounded-b-lg">
             <CardHeader className="text-center">
-              <CardTitle>Card 1</CardTitle>
+              <CardTitle>Script 1</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
-              <p>Content for card 1 goes here.</p>
+              <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
+                Xenon script 1
+              </div>
+              <Button className="w-full bg-blue-500 hover:bg-blue-700">
+                Button 1
+              </Button>
             </CardContent>
           </Card>
           <Card className="rounded-b-lg">
@@ -310,6 +314,14 @@ const Home: React.FC = () => {
             </CardHeader>
             <CardContent className="text-center">
               <p>Content for card 3 goes here.</p>
+            </CardContent>
+          </Card>
+          <Card className="rounded-b-lg">
+            <CardHeader className="text-center">
+              <CardTitle>Card 4</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center">
+              <p>Content for card 4 goes here.</p>
             </CardContent>
           </Card>
         </div>
