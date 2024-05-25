@@ -391,7 +391,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expires: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
