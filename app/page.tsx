@@ -1,3 +1,5 @@
+// /app/page.tsx
+
 "use client";
 
 import * as React from "react";
@@ -262,10 +264,10 @@ const Home: React.FC = () => {
 
   const unlockKey = async () => {
     try {
-      const response = await fetch("/api/generate-token");
-      const data = await response.json();
-      const token = data.token;
+      // Fetch a new unique token
+      const token = await fetchUniqueToken();
 
+      // Insert the token into Supabase with 'pending' status
       const { data: supabaseData, error: supabaseError } = await supabase
         .from("tokens")
         .insert([{ token, status: "pending" }]);
@@ -275,8 +277,10 @@ const Home: React.FC = () => {
         throw supabaseError;
       }
 
+      // Store the token in local storage
       localStorage.setItem("linkvertiseToken", token);
 
+      // Generate the Linkvertise URL and redirect the user
       const link = "https://xenon-next-js-seven.vercel.app/";
       const userid = 1092296;
       const linkvertiseUrl = linkvertise(link, userid, token);
