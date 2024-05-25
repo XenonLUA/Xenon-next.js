@@ -398,7 +398,10 @@ const Home: React.FC = () => {
             title="Hide And Seek Extreme"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Hide%20and%20seek%20Extreme.lua"))()'
           />
-          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard
+            title="Evade"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Evade.lua"))()'
+          />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
