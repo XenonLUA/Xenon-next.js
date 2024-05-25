@@ -89,7 +89,7 @@ const Home: React.FC = () => {
       });
     } else if (linkvertiseCompleted === "true") {
       localStorage.removeItem("linkvertiseCompleted");
-      generateKey();
+      generateKey(); // Ensure this is called only once
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -185,7 +185,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const generateKey = async () => {
+  const generateKey = async (): Promise<void> => {
     if (isGeneratingKey) return;
 
     setIsGeneratingKey(true);
@@ -197,6 +197,27 @@ const Home: React.FC = () => {
     console.log("Expiry date:", expiryDate.toISOString());
 
     try {
+      // Check if the key already exists
+      const { data: existingKey, error: checkError } = await supabase
+        .from("valid_keys")
+        .select("key")
+        .eq("key", newKey)
+        .single();
+
+      if (checkError && checkError.code !== "PGRST116") {
+        // Handle error that is not related to key not being found
+        console.error("Supabase error during key existence check:", checkError);
+        throw checkError;
+      }
+
+      if (existingKey) {
+        // If the key exists, generate a new key and retry
+        console.log("Key already exists, generating a new one.");
+        setIsGeneratingKey(false);
+        return generateKey();
+      }
+
+      // Insert the new key
       const { data, error } = await supabase
         .from("valid_keys")
         .insert([{ key: newKey, expiry: expiryDate.toISOString() }])
@@ -287,7 +308,6 @@ const Home: React.FC = () => {
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
           await updateTokenStatusInSupabase(token, "completed");
-          generateKey();
         } else {
           console.error("Token verification failed:", token);
           toast.error(
