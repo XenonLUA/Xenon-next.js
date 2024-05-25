@@ -13,19 +13,8 @@ export async function POST(req: NextRequest) {
 			.eq('token', token)
 			.single();
 
-		if (error || !data) {
-			return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 400 });
-		}
-
-		const currentTime = new Date();
-		const tokenCreationTime = new Date(data.created_at);
-		const timeDifference = currentTime.getTime() - tokenCreationTime.getTime();
-
-		// Define a valid time period (e.g., 1 hour)
-		const validTimePeriod = 60 * 60 * 1000; // 1 hour in milliseconds
-
-		if (data.status !== 'pending' || timeDifference > validTimePeriod) {
-			return NextResponse.json({ success: false, message: 'Token is either already used or expired' }, { status: 400 });
+		if (error || !data || data.status !== 'pending') {
+			return NextResponse.json({ success: false, message: 'Invalid or already used token' }, { status: 400 });
 		}
 
 		await supabase
