@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
 	}
 
 	try {
+		console.log(`Verifying token: ${token}`);
+
 		// Ambil token dari Supabase
 		const { data: tokenData, error } = await supabase
 			.from("tokens")
@@ -25,11 +27,22 @@ export async function GET(req: NextRequest) {
 		}
 
 		if (tokenData.status !== "pending") {
+			console.log(`Token ${token} already used or invalid with status ${tokenData.status}`);
 			return NextResponse.json({ success: false, message: "Token already used or invalid" }, { status: 400 });
 		}
 
 		// Update status token di Supabase
-		await supabase.from("tokens").update({ status: "completed" }).eq("token", token);
+		const { error: updateError } = await supabase
+			.from("tokens")
+			.update({ status: "completed" })
+			.eq("token", token);
+
+		if (updateError) {
+			console.error("Supabase update error:", updateError);
+			return NextResponse.json({ success: false, message: "Error updating token status" }, { status: 500 });
+		}
+
+		console.log(`Token ${token} verified successfully`);
 		return NextResponse.json({ success: true });
 
 	} catch (error) {
