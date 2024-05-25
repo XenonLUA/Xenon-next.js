@@ -71,12 +71,20 @@ const Home: React.FC = () => {
     const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
-      setKey(storedKey);
-      setExpiry(storedExpiry);
-      setProgress(100);
-      const expiryDate = new Date(storedExpiry);
-      updateExpiryProgress(expiryDate);
-      updateTimeRemaining(expiryDate);
+      checkKeyValidity(storedKey).then((isValid) => {
+        if (isValid) {
+          setKey(storedKey);
+          setExpiry(storedExpiry);
+          setProgress(100);
+          const expiryDate = new Date(storedExpiry);
+          updateExpiryProgress(expiryDate);
+          updateTimeRemaining(expiryDate);
+        } else {
+          localStorage.removeItem("key");
+          localStorage.removeItem("expiry");
+          startProgress();
+        }
+      });
     } else if (linkvertiseCompleted === "true") {
       localStorage.removeItem("linkvertiseCompleted");
       generateKey();
@@ -250,6 +258,27 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error updating token status in Supabase:", error);
       toast.error("Failed to update the token status on the server");
+    }
+  };
+
+  const checkKeyValidity = async (key: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .select("*")
+        .eq("key", key)
+        .single();
+
+      if (error || !data) {
+        console.error("Supabase check key validity error:", error);
+        return false;
+      }
+
+      const keyExpiry = new Date(data.expiry);
+      return keyExpiry > new Date();
+    } catch (error) {
+      console.error("Error checking key validity:", error);
+      return false;
     }
   };
 

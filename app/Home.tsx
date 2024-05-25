@@ -15,6 +15,49 @@ declare global {
   }
 }
 
+const ScriptCard: React.FC<{ title: string; script: string }> = ({
+  title,
+  script,
+}) => {
+  const copyScriptToClipboard = (scriptText: string) => {
+    navigator.clipboard.writeText(scriptText).then(
+      () => {
+        toast.success("Script copied to clipboard!");
+      },
+      () => {
+        toast.error("Failed to copy the script.");
+      }
+    );
+  };
+
+  return (
+    <Card className="rounded-b-lg">
+      <CardHeader className="text-center">
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="text-center">
+        <div
+          className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md"
+          style={{
+            wordWrap: "break-word",
+            maxWidth: "100%",
+            overflowWrap: "break-word",
+            overflow: "hidden",
+          }}
+        >
+          {script}
+        </div>
+        <Button
+          onClick={() => copyScriptToClipboard(script)}
+          className="w-full bg-orange-500 hover:bg-orange-700"
+        >
+          Copy Script
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
 const Home: React.FC = () => {
   const [progress, setProgress] = React.useState<number>(0);
   const [expiryProgress, setExpiryProgress] = React.useState<number>(0);
@@ -223,110 +266,74 @@ const Home: React.FC = () => {
   };
 
   return (
-    <section className="flex items-center justify-center bg-background min-h-screen">
+    <section className="flex items-center justify-center min-h-screen py-20">
       <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
-        <div className="max-w-3xl mx-auto text-center">
-          <div>
-            <span className="w-auto px-6 py-3 rounded-full bg-secondary text-sm font-medium text-primary text-[#3838ff]">
-              <span className="text-sm font-medium text-primary text-[#3838ff]">
-                <ReactTyped
-                  strings={["XENON HUB"]}
-                  typeSpeed={300}
-                  backSpeed={150}
-                  loop
-                />
-              </span>
-            </span>
-
-            <div>
-              <h1 className="max-w-3xl mx-auto mt-5 text-5xl font-bold tracking-normal text-white">
-                XENON HUB KEY
-              </h1>
-              <p className="max-w-xl mx-auto mt-5 text-lg leading-7 text-gray-500">
-                Use all Script Xenon HUB.
-              </p>
-            </div>
-          </div>
-
+        <div className="max-w-2xl p-6 mx-auto rounded-lg shadow">
+          <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-bold">
+            WELCOME TO XENON HUB
+          </h1>
           {progress < 100 ? (
-            <div className="mt-10">
-              <p className="mb-4 text-lg font-medium text-gray-300">
-                Preparing your key, please wait...
+            <div>
+              <Progress value={progress} className="w-full h-4 mb-4" />
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+                Loading... {progress}%
               </p>
-              <Progress value={progress} className="w-full" />
             </div>
-          ) : key && expiry ? (
-            <Card>
-              <CardHeader className="text-center">
-                <CardTitle>Here is your key!</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
-                  {key}
-                </div>
-                <Button
-                  onClick={copyToClipboard}
-                  className="w-full mb-2 bg-orange-500 hover:bg-orange-700"
-                >
-                  Copy Key
-                </Button>
-                <p className="text-sm text-gray-500 text-center">
-                  Key expires in: {timeRemaining}
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <Button
-              onClick={unlockKey}
-              className="w-full bg-orange-500 hover:bg-orange-700"
-            >
-              Unlock Key
-            </Button>
-          )}
-        </div>
-
-        {/* New Cards Section */}
-        <div className="w-full max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="rounded-b-lg">
-            <CardHeader className="text-center">
-              <CardTitle>Script 1</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
+          ) : key ? (
+            <div className="text-center">
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-medium">
+                Your Key:
+              </p>
               <div className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md">
-                Xenon script 1
+                {key}
               </div>
-              <Button className="w-full bg-blue-500 hover:bg-blue-700">
-                Button 1
+              <Button
+                onClick={copyToClipboard}
+                className="w-full bg-orange-500 hover:bg-orange-700"
+              >
+                Copy Key
               </Button>
-            </CardContent>
-          </Card>
-          <Card className="rounded-b-lg">
-            <CardHeader className="text-center">
-              <CardTitle>Card 2</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p>Content for card 2 goes here.</p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-b-lg">
-            <CardHeader className="text-center">
-              <CardTitle>Card 3</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p>Content for card 3 goes here.</p>
-            </CardContent>
-          </Card>
-          <Card className="rounded-b-lg">
-            <CardHeader className="text-center">
-              <CardTitle>Card 4</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p>Content for card 4 goes here.</p>
-            </CardContent>
-          </Card>
+              {expiry && (
+                <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+                  Key expiry: {new Date(expiry).toLocaleString()}
+                </p>
+              )}
+              {expiryProgress > 0 && (
+                <div className="mt-4">
+                  <p className="text-center">Time remaining: {timeRemaining}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center">
+              <h1 className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+                Get Your Key to Access
+              </h1>
+              <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
+                Click the button below to unlock your key.
+              </p>
+              <Button
+                onClick={unlockKey}
+                className="w-full bg-orange-500 hover:bg-orange-700"
+              >
+                Unlock Key
+              </Button>
+            </div>
+          )}
+          <ToastContainer />
         </div>
 
-        <ToastContainer />
+        {/* Grid of Script Cards */}
+        <div className="w-full max-w-7xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <ScriptCard
+            title="Hide And Seek Extreme"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Hide%20and%20seek%20Extreme.lua"))()'
+          />
+          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard title="COMING SOON" script="COMING SOON" />
+        </div>
       </div>
     </section>
   );
