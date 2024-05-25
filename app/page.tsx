@@ -119,6 +119,17 @@ const Home: React.FC = () => {
     }, 100);
   };
 
+  const fetchUniqueToken = async (): Promise<string> => {
+    try {
+      const response = await fetch("/api/generate-token");
+      const data = await response.json();
+      return data.token;
+    } catch (error) {
+      console.error("Error fetching token:", error);
+      throw new Error("Failed to fetch token");
+    }
+  };
+
   const updateExpiryProgress = React.useCallback((expiryDate: Date) => {
     const totalDuration = expiryDate.getTime() - new Date().getTime();
     const interval = setInterval(() => {
@@ -259,17 +270,16 @@ const Home: React.FC = () => {
 
   const unlockKey = async () => {
     try {
-      const response = await fetch("/api/generate-token");
-      const data = await response.json();
-      const token = data.token;
+      setIsGeneratingKey(true);
+      const token = await fetchUniqueToken();
 
-      const { data: supabaseData, error: supabaseError } = await supabase
+      const { data, error } = await supabase
         .from("tokens")
         .insert([{ token, status: "pending" }]);
 
-      if (supabaseError) {
-        console.error("Supabase insert error:", supabaseError);
-        throw supabaseError;
+      if (error) {
+        console.error("Supabase insert error:", error);
+        throw error;
       }
 
       localStorage.setItem("linkvertiseToken", token);
@@ -281,6 +291,8 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error during unlocking key:", error);
       toast.error("Failed to unlock the key. Please try again.");
+    } finally {
+      setIsGeneratingKey(false);
     }
   };
 
