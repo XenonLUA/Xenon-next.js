@@ -63,6 +63,9 @@ const Home: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
+  const [isGeneratingKey, setIsGeneratingKey] = React.useState<boolean>(false);
+  const [isVerifyingToken, setIsVerifyingToken] =
+    React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -183,6 +186,9 @@ const Home: React.FC = () => {
   };
 
   const generateKey = async () => {
+    if (isGeneratingKey) return;
+
+    setIsGeneratingKey(true);
     const newKey = generateRandomKey();
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
@@ -193,7 +199,8 @@ const Home: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from("valid_keys")
-        .insert([{ key: newKey, expiry: expiryDate.toISOString() }]);
+        .insert([{ key: newKey, expiry: expiryDate.toISOString() }])
+        .select("*");
 
       if (error) {
         console.error("Supabase error:", error);
@@ -213,6 +220,8 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
+    } finally {
+      setIsGeneratingKey(false);
     }
   };
 
@@ -257,11 +266,22 @@ const Home: React.FC = () => {
   };
 
   const verifyToken = async () => {
+    if (isVerifyingToken) return;
+
     const token = localStorage.getItem("linkvertiseToken");
     if (token) {
+      setIsVerifyingToken(true);
       try {
-        const response = await fetch(`/api/verify-token?token=${token}`);
+        const response = await fetch("/api/verify-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        });
+
         const data = await response.json();
+
         if (data.success) {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
@@ -278,6 +298,8 @@ const Home: React.FC = () => {
       } catch (error) {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token. Please try again.");
+      } finally {
+        setIsVerifyingToken(false);
       }
     }
   };
@@ -364,7 +386,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expired: {new Date(expiry).toLocaleString()}
+                  Key expires: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
