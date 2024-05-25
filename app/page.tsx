@@ -317,6 +317,7 @@ const Home: React.FC = () => {
           generateKey();
         } else {
           console.error("Token verification failed:", token);
+          toast.error("Token verification failed. Please try again.");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
