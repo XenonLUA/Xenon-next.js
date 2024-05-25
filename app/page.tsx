@@ -70,7 +70,6 @@ const Home: React.FC = () => {
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
     const storedExpiry = localStorage.getItem("expiry");
-    const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       checkKeyValidity(storedKey).then((isValid: boolean) => {
@@ -87,8 +86,6 @@ const Home: React.FC = () => {
           startProgress();
         }
       });
-    } else if (linkvertiseCompleted === "true") {
-      localStorage.removeItem("linkvertiseCompleted");
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -210,9 +207,12 @@ const Home: React.FC = () => {
       }
 
       if (existingKey) {
-        // If the key exists, generate a new key and retry
-        console.log("Key already exists, generating a new one.");
+        // If the key exists, return without creating a new key
+        console.log(
+          "Key already exists, returning without creating a new one."
+        );
         setIsGeneratingKey(false);
+        return;
       }
 
       // Insert the new key
@@ -304,7 +304,6 @@ const Home: React.FC = () => {
         if (data.success) {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
-          localStorage.setItem("linkvertiseCompleted", "true");
           await updateTokenStatusInSupabase(token, "completed");
           generateKey();
         } else {
