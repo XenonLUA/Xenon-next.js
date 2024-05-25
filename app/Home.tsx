@@ -6,7 +6,6 @@ import { Progress } from "@/components/ui/progress";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ReactTyped } from "react-typed";
 import { generateRandomKey, supabase } from "../lib/utils";
 
 declare global {
@@ -71,7 +70,7 @@ const Home: React.FC = () => {
     const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
-      checkKeyValidity(storedKey).then((isValid) => {
+      checkKeyValidity(storedKey).then((isValid: boolean) => {
         if (isValid) {
           setKey(storedKey);
           setExpiry(storedExpiry);
@@ -93,7 +92,20 @@ const Home: React.FC = () => {
       localStorage.removeItem("expiry");
       startProgress();
     }
-  }, []);
+
+    const expiryCheckInterval = setInterval(fetchExpiryFromSupabase, 60000);
+    const timeRemainingInterval = setInterval(() => {
+      if (expiry) {
+        const expiryDate = new Date(expiry);
+        updateTimeRemaining(expiryDate);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(expiryCheckInterval);
+      clearInterval(timeRemainingInterval);
+    };
+  }, [expiry]);
 
   const startProgress = () => {
     const interval = setInterval(() => {
@@ -123,8 +135,6 @@ const Home: React.FC = () => {
         localStorage.removeItem("key");
         localStorage.removeItem("expiry");
         toast.error("Key has expired.");
-      } else {
-        updateTimeRemaining(expiryDate);
       }
     }, 1000);
   }, []);
@@ -138,6 +148,38 @@ const Home: React.FC = () => {
     const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
 
     setTimeRemaining(`${days}d, ${hours}h, ${minutes}m, ${seconds}s`);
+  };
+
+  const fetchExpiryFromSupabase = async () => {
+    if (!key) return;
+
+    try {
+      console.log("Fetching expiry from Supabase for key:", key);
+      const { data, error } = await supabase
+        .from("valid_keys")
+        .select("expiry")
+        .eq("key", key)
+        .single();
+
+      if (error) {
+        console.error("Supabase fetch expiry error:", error);
+        return;
+      }
+
+      if (data && data.expiry) {
+        const newExpiry = new Date(data.expiry).toISOString();
+        if (newExpiry !== expiry) {
+          console.log("Updating expiry state:", newExpiry);
+          setExpiry(newExpiry);
+          localStorage.setItem("expiry", newExpiry);
+          const expiryDate = new Date(newExpiry);
+          updateExpiryProgress(expiryDate);
+          updateTimeRemaining(expiryDate);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching expiry from Supabase:", error);
+    }
   };
 
   const generateKey = async () => {
@@ -167,6 +209,7 @@ const Home: React.FC = () => {
       toast.success("Key saved successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
+      fetchExpiryFromSupabase();
     } catch (error) {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
@@ -188,12 +231,10 @@ const Home: React.FC = () => {
 
   const unlockKey = async () => {
     try {
-      // Generate the token
       const response = await fetch("/api/generate-token");
       const data = await response.json();
       const token = data.token;
 
-      // Save the token to Supabase
       const { data: supabaseData, error: supabaseError } = await supabase
         .from("tokens")
         .insert([{ token, status: "pending" }]);
@@ -205,14 +246,13 @@ const Home: React.FC = () => {
 
       localStorage.setItem("linkvertiseToken", token);
 
-      // Redirect to Linkvertise
       const link = "https://xenon-next-js-seven.vercel.app/";
-      const userid = 1092296; // Replace with your Linkvertise user ID
+      const userid = 1092296;
       const linkvertiseUrl = linkvertise(link, userid, token);
       window.location.href = linkvertiseUrl;
     } catch (error) {
       console.error("Error during unlocking key:", error);
-      toast.error("Failed to unlock key. Please try again.");
+      toast.error("Failed to unlock the key. Please try again.");
     }
   };
 
@@ -261,7 +301,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const checkKeyValidity = async (key: string) => {
+  const checkKeyValidity = async (key: string): Promise<boolean> => {
     try {
       const { data, error } = await supabase
         .from("valid_keys")
@@ -324,7 +364,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expiry: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
