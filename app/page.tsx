@@ -1,5 +1,3 @@
-// /app/page.tsx
-
 "use client";
 
 import * as React from "react";
@@ -65,6 +63,9 @@ const Home: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
+  const [isGeneratingKey, setIsGeneratingKey] = React.useState<boolean>(false);
+  const [isVerifyingToken, setIsVerifyingToken] =
+    React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -192,6 +193,9 @@ const Home: React.FC = () => {
   };
 
   const generateKey = async (): Promise<void> => {
+    if (isGeneratingKey) return;
+
+    setIsGeneratingKey(true);
     const newKey = generateRandomKey();
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
@@ -218,6 +222,7 @@ const Home: React.FC = () => {
         console.log(
           "Key already exists, returning without creating a new one."
         );
+        setIsGeneratingKey(false);
         return;
       }
 
@@ -246,6 +251,7 @@ const Home: React.FC = () => {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
     } finally {
+      setIsGeneratingKey(false);
     }
   };
 
@@ -264,10 +270,10 @@ const Home: React.FC = () => {
 
   const unlockKey = async () => {
     try {
-      // Fetch a new unique token
-      const token = await fetchUniqueToken();
+      const response = await fetch("/api/generate-token");
+      const data = await response.json();
+      const token = data.token;
 
-      // Insert the token into Supabase with 'pending' status
       const { data: supabaseData, error: supabaseError } = await supabase
         .from("tokens")
         .insert([{ token, status: "pending" }]);
@@ -277,10 +283,8 @@ const Home: React.FC = () => {
         throw supabaseError;
       }
 
-      // Store the token in local storage
       localStorage.setItem("linkvertiseToken", token);
 
-      // Generate the Linkvertise URL and redirect the user
       const link = "https://xenon-next-js-seven.vercel.app/";
       const userid = 1092296;
       const linkvertiseUrl = linkvertise(link, userid, token);
@@ -292,8 +296,11 @@ const Home: React.FC = () => {
   };
 
   const verifyToken = async () => {
+    if (isVerifyingToken) return;
+
     const token = localStorage.getItem("linkvertiseToken");
     if (token) {
+      setIsVerifyingToken(true);
       try {
         const response = await fetch("/api/verify-token", {
           method: "POST",
@@ -319,6 +326,7 @@ const Home: React.FC = () => {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token. Please try again.");
       } finally {
+        setIsVerifyingToken(false);
       }
     }
   };
