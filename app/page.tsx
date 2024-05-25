@@ -89,7 +89,6 @@ const Home: React.FC = () => {
       });
     } else if (linkvertiseCompleted === "true") {
       localStorage.removeItem("linkvertiseCompleted");
-      generateKey(); // Ensure this is called only once
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -214,7 +213,6 @@ const Home: React.FC = () => {
         // If the key exists, generate a new key and retry
         console.log("Key already exists, generating a new one.");
         setIsGeneratingKey(false);
-        return generateKey();
       }
 
       // Insert the new key
@@ -308,11 +306,9 @@ const Home: React.FC = () => {
           localStorage.removeItem("linkvertiseToken");
           localStorage.setItem("linkvertiseCompleted", "true");
           await updateTokenStatusInSupabase(token, "completed");
+          generateKey();
         } else {
           console.error("Token verification failed:", token);
-          toast.error(
-            "Token verification failed. Please complete the Linkvertise process."
-          );
           localStorage.removeItem("linkvertiseToken");
         }
       } catch (error) {
