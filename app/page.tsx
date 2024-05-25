@@ -315,7 +315,6 @@ const Home: React.FC = () => {
         if (data.success) {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
-          await updateTokenStatusInSupabase(token, "completed");
           generateKey();
         } else {
           console.error("Token verification failed:", token);
@@ -328,25 +327,6 @@ const Home: React.FC = () => {
       } finally {
         setIsVerifyingToken(false);
       }
-    }
-  };
-
-  const updateTokenStatusInSupabase = async (token: string, status: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("tokens")
-        .update({ status })
-        .eq("token", token);
-
-      if (error) {
-        console.error("Supabase update error:", error);
-        throw error;
-      }
-
-      console.log("Token status updated in Supabase:", data);
-    } catch (error) {
-      console.error("Error updating token status in Supabase:", error);
-      toast.error("Failed to update the token status on the server");
     }
   };
 
