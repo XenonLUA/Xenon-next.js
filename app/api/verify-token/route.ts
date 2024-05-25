@@ -1,34 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/utils';  // Adjust the path to your Supabase client
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
 	try {
-		const { token } = await req.json();
+		const { token } = await request.json();
 
+		// Check the validity of the token in your database
 		const { data, error } = await supabase
 			.from('tokens')
 			.select('*')
-			.eq('token_id', token) // Menggunakan token_id
+			.eq('token_id', token)
+			.eq('status', 'pending')
 			.single();
 
-		if (error || !data || data.status !== 'pending') {
-			return NextResponse.json({ success: false, message: 'Invalid or already used token' }, { status: 400 });
+		if (error || !data) {
+			return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 400 });
 		}
 
-		await supabase
+		// Update the token status to 'verified' if it exists
+		const { error: updateError } = await supabase
 			.from('tokens')
-			.update({ status: 'completed' })
+			.update({ status: 'verified' })
 			.eq('token_id', token);
 
-		return NextResponse.json({ success: true });
-	} catch (error: unknown) {
-		if (error instanceof Error) {
-			return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+		if (updateError) {
+			return NextResponse.json({ success: false, message: 'Failed to verify token' }, { status: 500 });
 		}
-		return NextResponse.json({ success: false, message: "An unknown error occurred" }, { status: 500 });
+
+		return NextResponse.json({ success: true, message: 'Token verified successfully' });
+
+	} catch (error) {
+		return NextResponse.json({ success: false, message: 'Error verifying token' }, { status: 500 });
 	}
 }
