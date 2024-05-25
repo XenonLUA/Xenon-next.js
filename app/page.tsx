@@ -320,6 +320,7 @@ const Home: React.FC = () => {
         } else {
           console.error("Token verification failed:", token);
           localStorage.removeItem("linkvertiseToken");
+          toast.error("Token verification failed. Please try again.");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
