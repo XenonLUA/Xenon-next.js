@@ -272,22 +272,22 @@ const Home: React.FC = () => {
     try {
       const response = await fetch("/api/generate-token");
       const data = await response.json();
-      const token = data.token;
+      const token_id = data.token;
 
       const { data: supabaseData, error: supabaseError } = await supabase
         .from("tokens")
-        .insert([{ token, status: "pending" }]);
+        .insert([{ token_id, status: "pending" }]);
 
       if (supabaseError) {
         console.error("Supabase insert error:", supabaseError);
         throw supabaseError;
       }
 
-      localStorage.setItem("linkvertiseToken", token);
+      localStorage.setItem("linkvertiseToken", token_id);
 
       const link = "https://xenon-next-js-seven.vercel.app/";
       const userid = 1092296;
-      const linkvertiseUrl = linkvertise(link, userid, token);
+      const linkvertiseUrl = linkvertise(link, userid, token_id);
       window.location.href = linkvertiseUrl;
     } catch (error) {
       console.error("Error during unlocking key:", error);

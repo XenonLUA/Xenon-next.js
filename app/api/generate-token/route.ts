@@ -1,26 +1,16 @@
-// /app/api/generate-token/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid'; // Import uuidv4
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const generateRandomToken = (length: number) => {
-	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-	let token = '';
-	for (let i = 0; i < length; i++) {
-		const randomIndex = Math.floor(Math.random() * characters.length);
-		token += characters[randomIndex];
-	}
-	return token;
-};
-
 const checkTokenExists = async (token: string) => {
 	const { data, error } = await supabase
 		.from('tokens')
-		.select('token')
-		.eq('token', token);
+		.select('token_id')
+		.eq('token_id', token);
 
 	if (error) {
 		console.error('Error checking token:', error);
@@ -30,12 +20,12 @@ const checkTokenExists = async (token: string) => {
 	return data.length > 0;
 };
 
-const generateUniqueToken = async (length: number) => {
+const generateUniqueToken = async () => {
 	let token;
 	let exists = true;
 
 	while (exists) {
-		token = generateRandomToken(length);
+		token = uuidv4(); // Menggunakan uuidv4() untuk generate token
 		exists = await checkTokenExists(token);
 	}
 
@@ -43,7 +33,7 @@ const generateUniqueToken = async (length: number) => {
 };
 
 export async function GET(req: NextRequest) {
-	const token = await generateUniqueToken(32); // Generate a unique 32-character random token
-	console.log('Generated unique token:', token);  // Add this line for debugging
+	const token = await generateUniqueToken();
+	console.log('Generated unique token:', token);
 	return NextResponse.json({ token });
 }
