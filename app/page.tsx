@@ -63,13 +63,11 @@ const Home: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = React.useState<string>("");
   const [key, setKey] = React.useState<string | null>(null);
   const [expiry, setExpiry] = React.useState<string | null>(null);
-  const [isGeneratingKey, setIsGeneratingKey] = React.useState<boolean>(false);
-  const [isVerifyingToken, setIsVerifyingToken] =
-    React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
     const storedExpiry = localStorage.getItem("expiry");
+    const linkvertiseCompleted = localStorage.getItem("linkvertiseCompleted");
 
     if (storedKey && storedExpiry && new Date(storedExpiry) > new Date()) {
       checkKeyValidity(storedKey).then((isValid: boolean) => {
@@ -86,6 +84,9 @@ const Home: React.FC = () => {
           startProgress();
         }
       });
+    } else if (linkvertiseCompleted === "true") {
+      localStorage.removeItem("linkvertiseCompleted");
+      generateKey();
     } else {
       localStorage.removeItem("key");
       localStorage.removeItem("expiry");
@@ -117,17 +118,6 @@ const Home: React.FC = () => {
         }
       });
     }, 100);
-  };
-
-  const fetchUniqueToken = async (): Promise<string> => {
-    try {
-      const response = await fetch("/api/generate-token");
-      const data = await response.json();
-      return data.token;
-    } catch (error) {
-      console.error("Error fetching token:", error);
-      throw new Error("Failed to fetch token");
-    }
   };
 
   const updateExpiryProgress = React.useCallback((expiryDate: Date) => {
@@ -192,10 +182,7 @@ const Home: React.FC = () => {
     }
   };
 
-  const generateKey = async (): Promise<void> => {
-    if (isGeneratingKey) return;
-
-    setIsGeneratingKey(true);
+  const generateKey = async () => {
     const newKey = generateRandomKey();
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 1);
@@ -204,33 +191,9 @@ const Home: React.FC = () => {
     console.log("Expiry date:", expiryDate.toISOString());
 
     try {
-      // Check if the key already exists
-      const { data: existingKey, error: checkError } = await supabase
-        .from("valid_keys")
-        .select("key")
-        .eq("key", newKey)
-        .single();
-
-      if (checkError && checkError.code !== "PGRST116") {
-        // Handle error that is not related to key not being found
-        console.error("Supabase error during key existence check:", checkError);
-        throw checkError;
-      }
-
-      if (existingKey) {
-        // If the key exists, return without creating a new key
-        console.log(
-          "Key already exists, returning without creating a new one."
-        );
-        setIsGeneratingKey(false);
-        return;
-      }
-
-      // Insert the new key
       const { data, error } = await supabase
         .from("valid_keys")
-        .insert([{ key: newKey, expiry: expiryDate.toISOString() }])
-        .select("*");
+        .insert([{ key: newKey, expiry: expiryDate.toISOString() }]);
 
       if (error) {
         console.error("Supabase error:", error);
@@ -250,8 +213,6 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error saving key:", error);
       toast.error("Failed to save the key on the server.");
-    } finally {
-      setIsGeneratingKey(false);
     }
   };
 
@@ -296,37 +257,27 @@ const Home: React.FC = () => {
   };
 
   const verifyToken = async () => {
-    if (isVerifyingToken) return;
-
     const token = localStorage.getItem("linkvertiseToken");
     if (token) {
-      setIsVerifyingToken(true);
       try {
-        const response = await fetch("/api/verify-token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        });
-
+        const response = await fetch(`/api/verify-token?token=${token}`);
         const data = await response.json();
-
         if (data.success) {
           console.log("Token verified successfully:", token);
           localStorage.removeItem("linkvertiseToken");
+          localStorage.setItem("linkvertiseCompleted", "true");
           await updateTokenStatusInSupabase(token, "completed");
           generateKey();
         } else {
           console.error("Token verification failed:", token);
+          toast.error(
+            "Token verification failed. Please complete the Linkvertise process."
+          );
           localStorage.removeItem("linkvertiseToken");
-          toast.error("Token verification failed. Please try again.");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
         toast.error("Failed to verify token. Please try again.");
-      } finally {
-        setIsVerifyingToken(false);
       }
     }
   };
@@ -413,7 +364,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expires: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
@@ -447,10 +398,7 @@ const Home: React.FC = () => {
             title="Hide And Seek Extreme"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Hide%20and%20seek%20Extreme.lua"))()'
           />
-          <ScriptCard
-            title="Evade"
-            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Evade.lua"))()'
-          />
+          <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
