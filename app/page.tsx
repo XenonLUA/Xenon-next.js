@@ -446,7 +446,7 @@ const Home: React.FC = () => {
           />
           <ScriptCard
             title="Fruit Seas"
-            script="https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Fruit%20Seas.lua"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Fruit%20Seas.lua"))()'
           />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
         </div>
