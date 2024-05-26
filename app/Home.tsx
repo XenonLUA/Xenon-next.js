@@ -440,7 +440,10 @@ const Home: React.FC = () => {
             title="Evade"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Evade.lua"))()'
           />
-          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard
+            title="Hair Cutting Simulator"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Hair%20Cutting%20Simulator.lua"))()'
+          />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
         </div>

@@ -11,10 +11,10 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ success: false, message: 'Token is required' }, { status: 400 });
 		}
 
-		// Check the validity of the token in your database
+		// Check if the token with 'pending' status exists
 		const { data, error } = await supabase
 			.from('tokens')
-			.select('*')
+			.select('token_id, status')
 			.eq('token_id', token)
 			.eq('status', 'pending')
 			.single();
@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
 		}
 
 		if (!data) {
-			return NextResponse.json({ success: false, message: 'Invalid token' }, { status: 400 });
+			return NextResponse.json({ success: false, message: 'Invalid token or not pending' }, { status: 400 });
 		}
 
-		// Update the token status to 'verified' if it exists
+		// Update the token status to 'verified'
 		const { error: updateError } = await supabase
 			.from('tokens')
 			.update({ status: 'verified' })
