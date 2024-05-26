@@ -314,11 +314,9 @@ const Home: React.FC = () => {
 
         if (data.success) {
           console.log("Token verified successfully:", token);
-          localStorage.removeItem("linkvertiseToken");
           generateKey();
         } else {
           console.error("Token verification failed:", token);
-          localStorage.removeItem("linkvertiseToken");
         }
       } catch (error) {
         console.error("Error verifying token:", error);
