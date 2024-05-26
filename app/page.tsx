@@ -66,6 +66,7 @@ const Home: React.FC = () => {
   const [isGeneratingKey, setIsGeneratingKey] = React.useState<boolean>(false);
   const [isVerifyingToken, setIsVerifyingToken] =
     React.useState<boolean>(false);
+  const [isUnlocking, setIsUnlocking] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -269,6 +270,9 @@ const Home: React.FC = () => {
   };
 
   const unlockKey = async () => {
+    if (isUnlocking) return; // Prevent multiple clicks
+    setIsUnlocking(true);
+
     try {
       const response = await fetch("/api/generate-token");
       const data = await response.json();
@@ -292,6 +296,8 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error during unlocking key:", error);
       toast.error("Failed to unlock the key. Please try again.");
+    } finally {
+      setIsUnlocking(false); // Reset unlocking state
     }
   };
 
@@ -410,9 +416,10 @@ const Home: React.FC = () => {
               </p>
               <Button
                 onClick={unlockKey}
+                disabled={isUnlocking} // Disable the button if unlocking is in progress
                 className="w-full bg-orange-500 hover:bg-orange-700"
               >
-                Unlock Key
+                {isUnlocking ? "Unlocking..." : "Unlock Key"}
               </Button>
             </div>
           )}
