@@ -244,7 +244,7 @@ const Home: React.FC = () => {
       setExpiry(expiryDate.toISOString());
       localStorage.setItem("key", newKey);
       localStorage.setItem("expiry", expiryDate.toISOString());
-      toast.success("Key saved successfully.");
+      toast.success("successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
       fetchExpiryFromSupabase();
