@@ -67,6 +67,7 @@ const Home: React.FC = () => {
   const [isVerifyingToken, setIsVerifyingToken] =
     React.useState<boolean>(false);
   const [isUnlocking, setIsUnlocking] = React.useState<boolean>(false);
+  const [hasValidKey, setHasValidKey] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -78,6 +79,7 @@ const Home: React.FC = () => {
           setKey(storedKey);
           setExpiry(storedExpiry);
           setProgress(100);
+          setHasValidKey(true);
           const expiryDate = new Date(storedExpiry);
           updateExpiryProgress(expiryDate);
           updateTimeRemaining(expiryDate);
@@ -143,6 +145,7 @@ const Home: React.FC = () => {
         clearInterval(interval);
         setKey(null);
         setExpiry(null);
+        setHasValidKey(false);
         localStorage.removeItem("key");
         localStorage.removeItem("expiry");
         toast.error("Key has expired.");
@@ -244,7 +247,8 @@ const Home: React.FC = () => {
       setExpiry(expiryDate.toISOString());
       localStorage.setItem("key", newKey);
       localStorage.setItem("expiry", expiryDate.toISOString());
-      toast.success("successfully.");
+      setHasValidKey(true);
+      toast.success("Key generated successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
       fetchExpiryFromSupabase();
@@ -381,7 +385,7 @@ const Home: React.FC = () => {
                 Loading... {progress}%
               </p>
             </div>
-          ) : key ? (
+          ) : hasValidKey && key ? (
             <div className="text-center">
               <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-medium">
                 Your Key:
