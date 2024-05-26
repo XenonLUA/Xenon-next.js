@@ -299,30 +299,52 @@ const Home: React.FC = () => {
     if (isVerifyingToken) return;
 
     const token = localStorage.getItem("linkvertiseToken");
-    if (token) {
-      setIsVerifyingToken(true);
-      try {
-        const response = await fetch("/api/verify-token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ token }),
-        });
+    const key = localStorage.getItem("key");
 
-        const data = await response.json();
+    // If the key already exists, no need to verify the token again
+    if (key) {
+      console.log("Key already exists. Skipping token verification.");
+      return;
+    }
 
-        if (data.success) {
-          console.log("Token verified successfully:", token);
-          generateKey();
-        } else {
-          console.error("Token verification failed:", token);
-        }
-      } catch (error) {
-        console.error("Error verifying token:", error);
-      } finally {
-        setIsVerifyingToken(false);
+    if (!token) {
+      console.log("No token found in localStorage. Skipping verification.");
+      return;
+    }
+
+    setIsVerifyingToken(true);
+
+    try {
+      const response = await fetch("/api/verify-token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Token verification failed:", errorData.message);
+        toast.error(`Token verification failed: ${errorData.message}`);
+        return;
       }
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log("Token verified successfully:", token);
+        toast.success("Token verified successfully!");
+        generateKey();
+      } else {
+        console.error("Token verification failed:", data.message);
+        toast.error(`Token verification failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error verifying token:", error);
+      toast.error("Error verifying token. Please try again.");
+    } finally {
+      setIsVerifyingToken(false);
     }
   };
 
