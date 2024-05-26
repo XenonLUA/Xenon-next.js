@@ -444,7 +444,10 @@ const Home: React.FC = () => {
             title="Hair Cutting Simulator"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Hair%20Cutting%20Simulator.lua"))()'
           />
-          <ScriptCard title="COMING SOON" script="COMING SOON" />
+          <ScriptCard
+            title="Fruit Seas"
+            script="https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Fruit%20Seas.lua"
+          />
           <ScriptCard title="COMING SOON" script="COMING SOON" />
         </div>
       </div>
