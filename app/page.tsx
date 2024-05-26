@@ -168,7 +168,7 @@ const Home: React.FC = () => {
     if (!key) return;
 
     try {
-      console.log("Fetching expiry from Supabase for key:", key);
+      console.log("Fetching expired for key:", key);
       const { data, error } = await supabase
         .from("valid_keys")
         .select("expiry")
@@ -176,7 +176,7 @@ const Home: React.FC = () => {
         .single();
 
       if (error) {
-        console.error("Supabase fetch expiry error:", error);
+        console.error("fetch expiry error:", error);
         return;
       }
 
@@ -401,7 +401,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expires: {new Date(expiry).toLocaleString()}
+                  Key expired: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (

@@ -66,6 +66,8 @@ const Home: React.FC = () => {
   const [isGeneratingKey, setIsGeneratingKey] = React.useState<boolean>(false);
   const [isVerifyingToken, setIsVerifyingToken] =
     React.useState<boolean>(false);
+  const [isUnlocking, setIsUnlocking] = React.useState<boolean>(false);
+  const [hasValidKey, setHasValidKey] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     const storedKey = localStorage.getItem("key");
@@ -77,6 +79,7 @@ const Home: React.FC = () => {
           setKey(storedKey);
           setExpiry(storedExpiry);
           setProgress(100);
+          setHasValidKey(true);
           const expiryDate = new Date(storedExpiry);
           updateExpiryProgress(expiryDate);
           updateTimeRemaining(expiryDate);
@@ -142,6 +145,7 @@ const Home: React.FC = () => {
         clearInterval(interval);
         setKey(null);
         setExpiry(null);
+        setHasValidKey(false);
         localStorage.removeItem("key");
         localStorage.removeItem("expiry");
         toast.error("Key has expired.");
@@ -164,7 +168,7 @@ const Home: React.FC = () => {
     if (!key) return;
 
     try {
-      console.log("Fetching expiry from Supabase for key:", key);
+      console.log("Fetching expired for key:", key);
       const { data, error } = await supabase
         .from("valid_keys")
         .select("expiry")
@@ -172,7 +176,7 @@ const Home: React.FC = () => {
         .single();
 
       if (error) {
-        console.error("Supabase fetch expiry error:", error);
+        console.error("fetch expiry error:", error);
         return;
       }
 
@@ -243,7 +247,8 @@ const Home: React.FC = () => {
       setExpiry(expiryDate.toISOString());
       localStorage.setItem("key", newKey);
       localStorage.setItem("expiry", expiryDate.toISOString());
-      toast.success("Key saved successfully.");
+      setHasValidKey(true);
+      toast.success("Key generated successfully.");
       updateExpiryProgress(expiryDate);
       updateTimeRemaining(expiryDate);
       fetchExpiryFromSupabase();
@@ -269,6 +274,9 @@ const Home: React.FC = () => {
   };
 
   const unlockKey = async () => {
+    if (isUnlocking) return; // Prevent multiple clicks
+    setIsUnlocking(true);
+
     try {
       const response = await fetch("/api/generate-token");
       const data = await response.json();
@@ -292,6 +300,8 @@ const Home: React.FC = () => {
     } catch (error) {
       console.error("Error during unlocking key:", error);
       toast.error("Failed to unlock the key. Please try again.");
+    } finally {
+      setIsUnlocking(false); // Reset unlocking state
     }
   };
 
@@ -375,7 +385,7 @@ const Home: React.FC = () => {
                 Loading... {progress}%
               </p>
             </div>
-          ) : key ? (
+          ) : hasValidKey && key ? (
             <div className="text-center">
               <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center font-medium">
                 Your Key:
@@ -410,9 +420,10 @@ const Home: React.FC = () => {
               </p>
               <Button
                 onClick={unlockKey}
+                disabled={isUnlocking} // Disable the button if unlocking is in progress
                 className="w-full bg-orange-500 hover:bg-orange-700"
               >
-                Unlock Key
+                {isUnlocking ? "Unlocking..." : "Unlock Key"}
               </Button>
             </div>
           )}
