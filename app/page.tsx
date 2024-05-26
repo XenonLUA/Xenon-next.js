@@ -299,52 +299,32 @@ const Home: React.FC = () => {
     if (isVerifyingToken) return;
 
     const token = localStorage.getItem("linkvertiseToken");
-    const key = localStorage.getItem("key");
+    if (token) {
+      setIsVerifyingToken(true);
+      try {
+        const response = await fetch("/api/verify-token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token }),
+        });
 
-    // If the key already exists, no need to verify the token again
-    if (key) {
-      console.log("Key already exists. Skipping token verification.");
-      return;
-    }
+        const data = await response.json();
 
-    if (!token) {
-      console.log("No token found in localStorage. Skipping verification.");
-      return;
-    }
-
-    setIsVerifyingToken(true);
-
-    try {
-      const response = await fetch("/api/verify-token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Token verification failed:", errorData.message);
-        toast.error(`Token verification failed: ${errorData.message}`);
-        return;
+        if (data.success) {
+          console.log("Token verified successfully:", token);
+          localStorage.removeItem("linkvertiseToken");
+          generateKey();
+        } else {
+          console.error("Token verification failed:", token);
+          localStorage.removeItem("linkvertiseToken");
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+      } finally {
+        setIsVerifyingToken(false);
       }
-
-      const data = await response.json();
-
-      if (data.success) {
-        console.log("Token verified successfully:", token);
-        toast.success("Token verified successfully!");
-        generateKey();
-      } else {
-        console.error("Token verification failed:", data.message);
-        toast.error(`Token verification failed: ${data.message}`);
-      }
-    } catch (error) {
-      console.error("Error verifying token:", error);
-      toast.error("Error verifying token. Please try again.");
-    } finally {
-      setIsVerifyingToken(false);
     }
   };
 
@@ -411,7 +391,7 @@ const Home: React.FC = () => {
               </Button>
               {expiry && (
                 <p className="w-auto px-6 py-3 rounded-full max-w-3xl mx-auto text-center">
-                  Key expired: {new Date(expiry).toLocaleString()}
+                  Key expires: {new Date(expiry).toLocaleString()}
                 </p>
               )}
               {expiryProgress > 0 && (
