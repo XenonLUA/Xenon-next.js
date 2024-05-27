@@ -1,42 +1,26 @@
-import { sql } from "@vercel/postgres";
-import { QueryResultRow } from "@vercel/postgres";
+"use client";
 
-interface ValidKeyRow extends QueryResultRow {
-  id: string;
-  key: string;
-  expiry: string; // Use string for timestamps to simplify
-  created_at: string | null;
-}
+import { ReactTyped } from "react-typed";
 
-export default async function ValidKeysPage(): Promise<JSX.Element> {
-  // Ensure the `valid_keys` table exists
-  await sql`
-    CREATE TABLE IF NOT EXISTS public.valid_keys (
-      id UUID NOT NULL DEFAULT uuid_generate_v4(),
-      key TEXT NOT NULL,
-      expiry TIMESTAMP WITH TIME ZONE NOT NULL,
-      created_at TIMESTAMP WITHOUT TIME ZONE NULL DEFAULT CURRENT_TIMESTAMP,
-      CONSTRAINT valid_keys_pkey PRIMARY KEY (id)
-    ) TABLESPACE pg_default;
-  `;
-
-  // Fetch data from the `valid_keys` table
-  const result = await sql`SELECT * FROM public.valid_keys`;
-  const rows = result.rows as ValidKeyRow[];
-
+export default function ValidateKey() {
   return (
-    <div>
-      {rows.map((row: ValidKeyRow) => (
-        <div key={row.id}>
-          <p>ID: {row.id}</p>
-          <p>Key: {row.key}</p>
-          <p>Expiry: {new Date(row.expiry).toLocaleString()}</p>
-          <p>
-            Created At:{" "}
-            {row.created_at ? new Date(row.created_at).toLocaleString() : "N/A"}
-          </p>
+    <section className="flex items-center justify-center bg-background h-[90vh]">
+      <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
+        <div className="max-w-3xl mx-auto text-center">
+          <div>
+            <span className="w-auto px-6 py-3 rounded-full bg-secondary">
+              <span className="text-sm font-medium text-primary text-[#3838ff]">
+                <ReactTyped
+                  strings={["XENON HUB"]}
+                  typeSpeed={300}
+                  backSpeed={150}
+                  loop
+                />
+              </span>
+            </span>
+          </div>
         </div>
-      ))}
-    </div>
+      </div>
+    </section>
   );
 }
