@@ -1,26 +1,38 @@
-"use client";
+import { sql } from "@vercel/postgres";
+import dotenv from "dotenv";
 
-import { ReactTyped } from "react-typed";
+// Load environment variables from .env file
+dotenv.config();
 
-export default function SaveKey() {
+const connectionString = process.env.POSTGRES_URL;
+
+if (!connectionString) {
+  throw new Error("Missing connection string for PostgreSQL database.");
+}
+
+// Ensure the connection string is set globally
+process.env.DATABASE_URL = connectionString;
+
+interface CartRow {
+  id: string;
+  quantity: number;
+}
+
+export default async function Cart({
+  params,
+}: {
+  params: { user: string };
+}): Promise<JSX.Element> {
+  const result = await sql`SELECT * FROM CARTS WHERE user_id=${params.user}`;
+  const rows = result.rows as CartRow[];
+
   return (
-    <section className="flex items-center justify-center bg-background h-[90vh]">
-      <div className="relative items-center w-full px-5 py-12 mx-auto lg:px-16 max-w-7xl md:px-12">
-        <div className="max-w-3xl mx-auto text-center">
-          <div>
-            <span className="w-auto px-6 py-3 rounded-full bg-secondary">
-              <span className="text-sm font-medium text-primary text-[#3838ff]">
-                <ReactTyped
-                  strings={["XENON HUB"]}
-                  typeSpeed={300}
-                  backSpeed={150}
-                  loop
-                />
-              </span>
-            </span>
-          </div>
+    <div>
+      {rows.map((row: CartRow) => (
+        <div key={row.id}>
+          {row.id} - {row.quantity}
         </div>
-      </div>
-    </section>
+      ))}
+    </div>
   );
 }
