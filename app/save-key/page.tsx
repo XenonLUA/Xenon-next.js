@@ -1,36 +1,40 @@
 import { sql } from "@vercel/postgres";
-import dotenv from "dotenv";
+import { QueryResultRow } from "@vercel/postgres";
 
-// Load environment variables from .env file
-dotenv.config();
-
-const connectionString = process.env.POSTGRES_URL;
-
-if (!connectionString) {
-  throw new Error("Missing connection string for PostgreSQL database.");
-}
-
-// Ensure the connection string is set globally
-process.env.DATABASE_URL = connectionString;
-
-interface CartRow {
+interface ValidKeyRow extends QueryResultRow {
   id: string;
-  quantity: number;
+  key: string;
+  expiry: string; // Use string for timestamps to simplify
+  created_at: string | null;
 }
 
-export default async function Cart({
-  params,
-}: {
-  params: { user: string };
-}): Promise<JSX.Element> {
-  const result = await sql`SELECT * FROM CARTS WHERE user_id=${params.user}`;
-  const rows = result.rows as CartRow[];
+export default async function ValidKeysPage(): Promise<JSX.Element> {
+  // Ensure the `valid_keys` table exists
+  await sql`
+    CREATE TABLE IF NOT EXISTS public.valid_keys (
+      id UUID NOT NULL DEFAULT uuid_generate_v4(),
+      key TEXT NOT NULL,
+      expiry TIMESTAMP WITH TIME ZONE NOT NULL,
+      created_at TIMESTAMP WITHOUT TIME ZONE NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT valid_keys_pkey PRIMARY KEY (id)
+    ) TABLESPACE pg_default;
+  `;
+
+  // Fetch data from the `valid_keys` table
+  const result = await sql`SELECT * FROM public.valid_keys`;
+  const rows = result.rows as ValidKeyRow[];
 
   return (
     <div>
-      {rows.map((row: CartRow) => (
+      {rows.map((row: ValidKeyRow) => (
         <div key={row.id}>
-          {row.id} - {row.quantity}
+          <p>ID: {row.id}</p>
+          <p>Key: {row.key}</p>
+          <p>Expiry: {new Date(row.expiry).toLocaleString()}</p>
+          <p>
+            Created At:{" "}
+            {row.created_at ? new Date(row.created_at).toLocaleString() : "N/A"}
+          </p>
         </div>
       ))}
     </div>
