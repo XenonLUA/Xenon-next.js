@@ -36,7 +36,7 @@ const ScriptCard: React.FC<{ title: string; script: string }> = ({
       </CardHeader>
       <CardContent className="text-center">
         <div
-          className="flex items-center justify-center p-2 mb-4 font-mono text-sm text-center text-white bg-gray-800 rounded-md"
+          className="p-4 mb-4 font-mono text-sm text-white bg-gray-800 rounded-md"
           style={{
             wordWrap: "break-word",
             maxWidth: "100%",
@@ -44,7 +44,7 @@ const ScriptCard: React.FC<{ title: string; script: string }> = ({
             overflow: "hidden",
           }}
         >
-          {script}
+          <pre>{script}</pre>
         </div>
         <Button
           onClick={() => copyScriptToClipboard(script)}
