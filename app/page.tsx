@@ -452,6 +452,10 @@ const Home: React.FC = () => {
             title="Interliminality"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Interliminality.lua"))()'
           />
+          <ScriptCard
+            title="Anime Dungeon Fighters"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/AnimeDuengeuon.lua"))()'
+          />
         </div>
       </div>
     </section>
