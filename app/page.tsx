@@ -456,6 +456,10 @@ const Home: React.FC = () => {
             title="Anime Dungeon Fighters"
             script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/AnimeDuengeuon.lua"))()'
           />
+          <ScriptCard
+            title="Reborn a swordan"
+            script='loadstring(game:HttpGet("https://raw.githubusercontent.com/XenonLUA/XenonHUB/main/Script/Reborn%20a%20swordan.lua"))()'
+          />
         </div>
       </div>
     </section>
